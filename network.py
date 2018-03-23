@@ -1,4 +1,5 @@
 from spice_parser import spice_parser
+from error import *
 import numpy as np
 from device.vcvs import vcvs
 from device.ccvs import ccvs
@@ -46,9 +47,7 @@ class network():
         try:
             self.tree = self.parser.parse(code)
         except:
-            # need to modify
-            print("bad syntax!")
-            exit()
+            raise parser_syntax_error("bad syntax!")
         self.elements, self.nodeDict = self.build()
         # need to handle the command
 
@@ -62,13 +61,9 @@ class network():
                 if ele.name not in elements.keys():
                     elements[ele.name] = ele
                 else:
-                    # need to modify
-                    print("same name for different devices!")
-                    exit()
+                    raise net_definition_error("same name for different devices!")
         if "0" not in node_dict.keys():
-            # need to modify
-            print("You must assign the ground node as 0!")
-            exit()
+            raise net_definition_error("You must assign the ground node as 0!")
         for element in elements.values():
             if isinstance(element, ccvs) or isinstance(element, cccs):
                 element.v_src = elements["v" + element.v_src.children[0].value]
