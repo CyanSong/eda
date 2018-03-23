@@ -1,5 +1,7 @@
 from lark import Lark
-from lark.tree import pydot__tree_to_png    # Just a neat utility function
+
+# from lark.tree import pydot__tree_to_png  # Just a neat utility function
+
 spice_parser = Lark(r"""
     circuits: title definition [commands] end
     title:  NONSENSE ["\r"]"\n"
@@ -10,7 +12,7 @@ spice_parser = Lark(r"""
     comment: "*" NONSENSE (["\r"]"\n")
     element: (res | cap | vdc | idc | induc | vccs | vcvs | ccvs| cccs) ["\r"]"\n"
     command: "." (plot | acdef | dcdef)+ (["\r"]"\n")
-
+    
     res: "r" ELEMENTNAME  pospoint  negpoint value  
     cap: "c" ELEMENTNAME  pospoint negpoint value 
     vdc: "v" ELEMENTNAME  pospoint negpoint value 
@@ -20,7 +22,7 @@ spice_parser = Lark(r"""
     vcvs: "e" ELEMENTNAME pospoint negpoint ctlpospnt ctlnegpnt value
     cccs: "f" ELEMENTNAME pospoint negpoint vname value
     ccvs:"h" ELEMENTNAME pospoint negpoint vname value
-
+    
     ?pospoint: POINT
     ?negpoint: POINT
     ?ctlpospnt:POINT 
@@ -70,4 +72,4 @@ spice_parser = Lark(r"""
     %import common.WS_INLINE -> W
     %import common.WS -> WS
     %ignore W
-""",start='circuits')
+""", start='circuits')
