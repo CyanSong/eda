@@ -1,4 +1,14 @@
 from device.linear_device import linear_device
+from basic import *
+
+
+def get_ccvs(element_tree, node_dict):
+    nodes = remap_node([i.value for i in element_tree.children[1:3]], node_dict)
+    name = "h" + element_tree.children[0].value
+    val = parse_value(element_tree.children[4])
+    vsrc_name = element_tree.children[3]
+    return ccvs(name, nodes[0], nodes[1], vsrc_name, val)
+
 
 
 class ccvs(linear_device):
@@ -15,14 +25,10 @@ class ccvs(linear_device):
         self.current = current
 
     def get_dc_current(self):
-        if self.current is not None:
-            return self.current
-        else:
-            # need to modify
-            print("get current before solve")
-            exit()
+        assert (self.current is not None)
+        return self.current
 
-    def make_stamp(self, mat, vec):
+    def make_stamp(self, mat, vec=None, freq=None):
         index = self.v_src.index
         assert (self.index is not None and index is not None)
         mat[self.index][index] -= self.val

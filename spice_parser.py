@@ -1,6 +1,11 @@
 from lark import Lark
+import re
+
 
 # from lark.tree import pydot__tree_to_png  # Just a neat utility function
+def pre_compile(source):
+    return re.sub(r'(\r?\n)+', '\n', source).lower()
+
 
 spice_parser = Lark(r"""
     circuits: title definition [commands] end
@@ -9,20 +14,26 @@ spice_parser = Lark(r"""
     commands: ( command | comment )+
     end:".end" [WS]
     
-    comment: "*" NONSENSE (["\r"]"\n")
-    element: (res | cap | vdc | idc | induc | vccs | vcvs | ccvs| cccs) ["\r"]"\n"
+    comment: "*" NONSENSE (["\r"]"\n") 
+    element: (res | cap | vsrc | isrc | induc | vccs | vcvs | ccvs| cccs) ["\r"]"\n"
     command: "." (plot | acdef | dcdef)+ (["\r"]"\n")
     
     res: "r" ELEMENTNAME  pospoint  negpoint value  
     cap: "c" ELEMENTNAME  pospoint negpoint value 
-    vdc: "v" ELEMENTNAME  pospoint negpoint value 
-    idc: "i" ELEMENTNAME  pospoint negpoint value 
+    vsrc: "v" ELEMENTNAME  pospoint negpoint spec
+        spec:   ["dc"] dvalue           ->dc 
+                | "ac" [amag [aphase]] ->ac
+    
+    isrc: "i" ELEMENTNAME  pospoint negpoint value 
     induc: "l" ELEMENTNAME  pospoint negpoint value
     vccs: "g" ELEMENTNAME pospoint negpoint ctlpospnt ctlnegpnt value
     vcvs: "e" ELEMENTNAME pospoint negpoint ctlpospnt ctlnegpnt value
     cccs: "f" ELEMENTNAME pospoint negpoint vname value
     ccvs:"h" ELEMENTNAME pospoint negpoint vname value
     
+    ?dvalue:value
+    ?amag:value
+    ?aphase:value
     ?pospoint: POINT
     ?negpoint: POINT
     ?ctlpospnt:POINT 
@@ -39,8 +50,8 @@ spice_parser = Lark(r"""
     ?incr2: value
 
     dcdef: "dc" src1 start1 stop1 incr1 [src2 start2 stop2 incr2]
-    acdef: "ac"  actype pernumber fstart fstop
-    actype:  "dec"  -> dec
+    acdef: "ac"  [type] pernumber fstart fstop
+    type:  "dec"  -> dec
             | "lin" -> lin
             |"oct"  -> oct
     pernumber: INT
@@ -66,7 +77,7 @@ spice_parser = Lark(r"""
 
     NONSENSE:/[^\n]+/
     ELEMENTNAME: /([0-9]|[a-z])+/
-    UNIT: "k" | "p" | "n" | "u" | "M" | "f"|"meg"|"g"|"t"|"db" 
+    UNIT: "k" | "p" | "n" | "u" | "m" | "f"|"meg"|"g"|"t"|"db" 
     %import common.SIGNED_NUMBER    -> NUMBER
     %import common.INT 
     %import common.WS_INLINE -> W

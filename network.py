@@ -1,52 +1,26 @@
-from spice_parser import spice_parser
+from spice_parser import *
 from error import *
+from basic import *
 import numpy as np
-from device.vcvs import vcvs
-from device.ccvs import ccvs
-from device.cccs import cccs
-from device.vccs import vccs
-from device.res import res
-from device.vdc import vdc
-from device.idc import idc
-
-
-def parse_value(value_tree):
-    # TODO9/*-+
-    return float(value_tree.children[0].value)
-
-
-def getNode(nodeNameList, nodeDict):
-    res = []
-    for nodeName in nodeNameList:
-        if nodeName not in nodeDict:
-            t = node(nodeName, len(nodeDict))
-            nodeDict[nodeName] = t
-        res.append(nodeDict[nodeName])
-    return res
-
-
-class node():
-    def __init__(self, name, number):
-        self.name = name
-        self.num = number
-        self.voltage = None
-
-    def get_voltage(self):
-        if self.voltage is None:
-            print("get voltage before assignment!")
-            exit()
-        return self.voltage
-
-    def put_voltage(self, val):
-        self.voltage = val
+from device.vcvs import vcvs, get_vcvs
+from device.ccvs import ccvs, get_ccvs
+from device.cccs import cccs, get_cccs
+from device.vccs import vccs, get_vccs
+from device.res import res, get_res
+from device.vsrc import vsrc, get_vsrc
+from device.isrc import isrc, get_isrc
+from device.cap import cap, get_cap
+from device.ind import ind, get_ind
 
 
 class network():
     def __init__(self, code):
+        code = pre_compile(code)
+        # print(code)
         self.parser = spice_parser
         try:
             self.tree = self.parser.parse(code)
-        except:
+        except Exception:
             raise parser_syntax_error("bad syntax!")
         self.elements, self.nodeDict = self.build()
         # need to handle the command
@@ -69,59 +43,54 @@ class network():
                 element.v_src = elements["v" + element.v_src.children[0].value]
         return elements, node_dict
 
-    def add_element(self, element, nodeDict):
+    def add_element(self, element, node_dict):
         if element.data == 'res':
-            nodes = getNode([i.value for i in element.children[1:3]], nodeDict)
-            e = res("r" + element.children[0].value, nodes[0], nodes[1], parse_value(element.children[3]))
+            return get_res(element, node_dict)
         elif element.data == 'vccs':
-            nodes = getNode([i.value for i in element.children[1:5]], nodeDict)
-            e = vccs("g" + element.children[0].value, nodes[0], nodes[1], nodes[2], nodes[3],
-                     parse_value(element.children[5]))
-        elif element.data == 'idc':
-            nodes = getNode([i.value for i in element.children[1:3]], nodeDict)
-            e = idc("i" + element.children[0].value, nodes[0], nodes[1], parse_value(element.children[3]))
-        elif element.data == 'vdc':
-            nodes = getNode([i.value for i in element.children[1:3]], nodeDict)
-            e = vdc("v" + element.children[0].value, nodes[0], nodes[1], parse_value(element.children[3]))
+            return get_vccs(element, node_dict)
+        elif element.data == 'isrc':
+            return get_isrc(element, node_dict)
+        elif element.data == 'vsrc':
+            return get_vsrc(element, node_dict)
         elif element.data == 'cccs':
-            nodes = getNode([i.value for i in element.children[1:3]], nodeDict)
-            e = cccs("f" + element.children[0].value, nodes[0], nodes[1], element.children[3],
-                     parse_value(element.children[4]))
+            return get_cccs(element, node_dict)
         elif element.data == 'vcvs':
-            nodes = getNode([i.value for i in element.children[1:5]], nodeDict)
-            e = vcvs("e" + element.children[0].value, nodes[0], nodes[1], nodes[2], nodes[3],
-                     parse_value(element.children[5]))
+            return get_vcvs(element, node_dict)
         elif element.data == 'ccvs':
-            nodes = getNode([i.value for i in element.children[1:3]], nodeDict)
-            e = ccvs("h" + element.children[0].value, nodes[0], nodes[1], element.children[3],
-                     parse_value(element.children[4]))
-        else:
-            nodes = []
-            e = None
-        return e
+            return get_ccvs(element, node_dict)
+        elif element.data == 'cap':
+            return get_cap(element, node_dict)
+        elif element.data == "induc":
+            return get_ind(element, node_dict)
 
-    def generate_linear_equation(self):
+    def generate_linear_equation(self, ac_dc="dc"):
         index = 0
         v_node_num = len(self.nodeDict)
         for i in self.elements.values():
-            if isinstance(i, vdc) or isinstance(i, vcvs) or isinstance(i, ccvs):
+            if hasattr(i, "index"):
                 i.put_index(index + v_node_num)
                 index += 1
-        return np.zeros((v_node_num + index, v_node_num + index)), np.zeros((v_node_num + index, 1))
+        dtype = np.float64 if ac_dc == "dc" else np.complex128
+        return np.zeros((v_node_num + index, v_node_num + index), dtype=dtype), np.zeros((v_node_num + index, 1),
+                                                                                         dtype=dtype)
+
+    # TODO:modify the following bad logic
 
     # This is a naive dc solver just for test
-    def dc_handler(self, task):
-        rst = self.dc_solver()
-        self.put_dc_rst(rst)
+    def ac_handler(self, task):
+        rst = self.ac_solver(3000)
+        self.put_rst(rst)
         for n in self.nodeDict.values():
             print(n.name, n.get_voltage())
-        for element in self.elements.values():
-            print(element.name, element.get_dc_current())
+        # for element in self.elements.values():
+        #     print(element.name, element.get_dc_current())
 
-    def dc_solver(self):
-        a, b = self.generate_linear_equation()
+    def ac_solver(self, freq):
+        a, b = self.generate_linear_equation('ac')
         for i in self.elements.values():
-            i.make_stamp(a, b)
+            i.make_stamp(a, b, freq)
+        print(a)
+        print(b)
         ground_node = self.nodeDict["0"].num
         index = list(range(len(a)))
         index.remove(ground_node)
@@ -130,9 +99,33 @@ class network():
         rst.insert(ground_node, [0])
         return np.array(rst)
 
-    def put_dc_rst(self, rst_mat):
+    # This is a naive dc solver just for test
+    def dc_handler(self, task):
+        rst = self.dc_solver()
+        self.put_rst(rst)
+        for n in self.nodeDict.values():
+            print(n.name, n.get_voltage())
+        for element in self.elements.values():
+            print(element.name, element.get_dc_current())
+
+    # This part also need to modify
+    def put_rst(self, rst_mat):
         for i in self.nodeDict.values():
             i.put_voltage(rst_mat[i.num][0])
-        for i in self.elements.values():
-            if hasattr(i, "index"):
-                i.put_dc_current(rst_mat[i.index][0])
+        # for i in self.elements.values():
+        #     if hasattr(i, "index"):
+        #         i.put_dc_current(rst_mat[i.index][0])
+
+    # This part also need to modify
+    def dc_solver(self):
+        return self.ac_solver(0)
+        # a, b = self.generate_linear_equation()
+        # for i in self.elements.values():
+        #     i.make_stamp(a, b, 0)
+        # ground_node = self.nodeDict["0"].num
+        # index = list(range(len(a)))
+        # index.remove(ground_node)
+        # a, b = a[np.ix_(index, index)], b[np.ix_(index, [0])]
+        # rst = list(np.linalg.solve(a, b))
+        # rst.insert(ground_node, [0])
+        # return np.array(rst)

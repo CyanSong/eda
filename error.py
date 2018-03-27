@@ -4,6 +4,3 @@ class parser_syntax_error(Exception):
 
 class net_definition_error(Exception):
     pass
-
-
-

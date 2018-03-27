@@ -4,10 +4,11 @@ import network as nt
 def test():
     circuits = open("spice.sp")
     circuits = circuits.read()
-    print(circuits + "\n")
+    #print(circuits + "\n")
 
     c = nt.network(circuits)
-    c.dc_handler(None)
+    c.ac_handler(None)
+
     # pydot__tree_to_png(tree, r"tree.png")
 
 
