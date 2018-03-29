@@ -21,9 +21,6 @@ spice_parser = Lark(r"""
     res: "r" ELEMENTNAME  pospoint  negpoint value  
     cap: "c" ELEMENTNAME  pospoint negpoint value 
     vsrc: "v" ELEMENTNAME  pospoint negpoint spec
-        spec:   ["dc"] dvalue           ->dc 
-                | "ac" [amag [aphase]] ->ac
-    
     isrc: "i" ELEMENTNAME  pospoint negpoint value 
     induc: "l" ELEMENTNAME  pospoint negpoint value
     vccs: "g" ELEMENTNAME pospoint negpoint ctlpospnt ctlnegpnt value
@@ -31,6 +28,8 @@ spice_parser = Lark(r"""
     cccs: "f" ELEMENTNAME pospoint negpoint vname value
     ccvs:"h" ELEMENTNAME pospoint negpoint vname value
     
+    spec:   ["dc"] dvalue           ->vdc 
+        | "ac" [amag [aphase]] ->vac
     ?dvalue:value
     ?amag:value
     ?aphase:value
