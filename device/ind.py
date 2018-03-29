@@ -19,9 +19,12 @@ class ind(linear_device):
 
     def make_stamp(self, mat, vec, freq):
         assert (self.index is not None)
-        sl = self.val * complex(0, freq)
+        sl = self.val * (complex(0, freq) if freq!=0 else 0)
         mat[self.index][self.index] -= sl
         mat[self.pos_node.num][self.index] += 1
         mat[self.neg_node.num][self.index] -= 1
         mat[self.index][self.neg_node.num] -= 1
         mat[self.index][self.pos_node.num] += 1
+
+    def get_current(self,rst_vec,freq=0):
+        return rst_vec[self.index][0]

@@ -8,5 +8,5 @@ class linear_device(device):
         self.neg_node = neg_node
         self.val = val
 
-    def get_voltage_diff(self):
-        return self.pos_node.get_voltage() - self.neg_node.get_voltage()
+    def get_voltage_diff(self, rst_vec):
+        return self.pos_node.get_voltage(rst_vec) - self.neg_node.get_voltage(rst_vec)

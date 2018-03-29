@@ -22,6 +22,6 @@ class vccs(linear_device):
         mat[self.neg_node.num][self.ctl_pos_node.num] -= self.val
         mat[self.neg_node.num][self.ctl_neg_node.num] += self.val
 
-    def get_dc_current(self):
-        ctl_vol_diff = self.ctl_pos_node.get_voltage() - self.ctl_neg_node.get_voltage()
+    def get_current(self,rst_vec,freq=0):
+        ctl_vol_diff = self.ctl_pos_node.get_voltage(rst_vec) - self.ctl_neg_node.get_voltage(rst_vec)
         return ctl_vol_diff * self.val

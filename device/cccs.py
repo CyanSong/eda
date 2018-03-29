@@ -20,6 +20,7 @@ class cccs(linear_device):
         mat[self.pos_node.num][index] += self.val
         mat[self.neg_node.num][index] -= self.val
 
-    def get_dc_current(self):
-        ctl_cur = self.v_src.get_dc_current()
+    def get_current(self,rst_vec,freq=0):
+        ctl_cur = self.v_src.get_current(rst_vec)
         return self.val * ctl_cur
+

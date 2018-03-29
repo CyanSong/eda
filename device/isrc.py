@@ -18,5 +18,5 @@ class isrc(linear_device):
         vec[self.pos_node.num][0] -= self.val
         vec[self.neg_node.num][0] += self.val
 
-    def get_dc_current(self):
+    def get_current(self):
         return self.val

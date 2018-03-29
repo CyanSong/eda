@@ -14,16 +14,16 @@ from device.ind import ind, get_ind
 from command.ac_cmd import *
 from command.dc_cmd import *
 
+
 class network():
     def __init__(self, code):
         code = pre_compile(code)
-        # print(code)
         self.parser = spice_parser
         try:
             self.tree = self.parser.parse(code)
         except Exception:
             raise parser_syntax_error("bad syntax!")
-        self.elements, self.nodeDict = self.build()
+        self.elements, self.node_dict = self.build()
         self.handle_cmds()
 
     def build(self):
@@ -64,19 +64,15 @@ class network():
         elif element.data == "induc":
             return get_ind(element, node_dict)
 
-
-    # TODO:modify the following bad logic
     def handle_cmds(self):
         commands = self.tree.children[2]
-        rst=[]
+        rst = []
         for command in commands.children:
             if command.data == "command":
                 cmd_tree = command.children[0]
                 if cmd_tree.data == 'acdef':
-                    rst.append(ac_handler(self,get_ac(cmd_tree)))
+                    rst.append(ac_handler(self, get_ac(cmd_tree)))
                 elif cmd_tree.data == 'dcdef':
-                    rst.append(dc_handler(self,get_dc(cmd_tree)))
+                    rst.append(dc_handler(self, get_dc(cmd_tree)))
                 else:
                     pass
-
-

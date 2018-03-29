@@ -14,8 +14,11 @@ class cap(linear_device):
         linear_device.__init__(self, name, pos_node, neg_node, val)
 
     def make_stamp(self, mat, vec, freq):
-        sc = self.val * complex(0, freq)
+        sc = self.val * (complex(0, freq) if freq!=0 else 0)
         mat[self.pos_node.num][self.pos_node.num] += sc
         mat[self.pos_node.num][self.neg_node.num] -= sc
         mat[self.neg_node.num][self.pos_node.num] -= sc
         mat[self.neg_node.num][self.neg_node.num] += sc
+
+    def get_current(self,rst_vec,freq=0):
+        return (self.pos_node.get_voltage(rst_vec) - self.neg_node.get_voltage(rst_vec))*self.val * complex(0, freq)

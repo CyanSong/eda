@@ -1,16 +1,18 @@
 import numpy as np
-def parse_value(value_tree):
+
+
+def parse_value(value_tree, t=float):
     simple_unit_dict = {"k": 1000, "p": 10 ** -12, "n": 10 ** -9, "u": 10 ** -6, "m": 10 ** -3, "f": 10 ** -15,
                         "meg": 10 ** 3, 'G': 10 ** 6, 'T': 10 ** 9}
     # only support "k" | "p" | "n" | "u" | "m" | "f" now
     if hasattr(value_tree.children[0], "unit"):
         if value_tree.children[0].unit in simple_unit_dict.keys():
-            return float(value_tree.children[0].value) * simple_unit_dict[value_tree.children[0].unit]
+            return t(value_tree.children[0].value) * simple_unit_dict[value_tree.children[0].unit]
         else:
             # ToDo support  "db"
-            return float(value_tree.children[0].value)
+            return t(value_tree.children[0].value)
     else:
-        return float(value_tree.children[0].value)
+        return t(value_tree.children[0].value)
 
 
 def remap_node(node_name_list, node_dict):
@@ -34,7 +36,7 @@ class node():
 
 def generate_linear_equation(net, ac_dc="dc"):
     index = 0
-    v_node_num = len(net.nodeDict)
+    v_node_num = len(net.node_dict)
     for i in net.elements.values():
         if hasattr(i, "index"):
             i.put_index(index + v_node_num)

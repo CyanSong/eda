@@ -9,7 +9,6 @@ def get_vcvs(element_tree, node_dict):
     return vcvs(name, nodes[0], nodes[1], nodes[2], nodes[3], val)
 
 
-
 class vcvs(linear_device):
     def __init__(self, name, pos_node, neg_node, ctl_pos_node, ctl_neg_node, val):
         linear_device.__init__(self, name, pos_node, neg_node, val)
@@ -21,12 +20,8 @@ class vcvs(linear_device):
     def put_index(self, index):
         self.index = index
 
-    def put_dc_current(self, current):
-        self.current = current
-
-    def get_dc_current(self):
-        assert (self.current is not None)
-        return self.current
+    def get_current(self, rst_vec, freq=0):
+        return rst_vec[self.index][0]
 
     def make_stamp(self, mat, vec=None, freq=None):
         assert (self.index is not None)
