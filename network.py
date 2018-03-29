@@ -11,7 +11,8 @@ from device.vsrc import vsrc, get_vsrc
 from device.isrc import isrc, get_isrc
 from device.cap import cap, get_cap
 from device.ind import ind, get_ind
-
+from command.ac_cmd import *
+from command.dc_cmd import *
 
 class network():
     def __init__(self, code):
@@ -23,7 +24,7 @@ class network():
         except Exception:
             raise parser_syntax_error("bad syntax!")
         self.elements, self.nodeDict = self.build()
-        # need to handle the command
+        self.handle_cmds()
 
     def build(self):
         elements = dict()
@@ -63,69 +64,19 @@ class network():
         elif element.data == "induc":
             return get_ind(element, node_dict)
 
-    def generate_linear_equation(self, ac_dc="dc"):
-        index = 0
-        v_node_num = len(self.nodeDict)
-        for i in self.elements.values():
-            if hasattr(i, "index"):
-                i.put_index(index + v_node_num)
-                index += 1
-        dtype = np.float64 if ac_dc == "dc" else np.complex128
-        return np.zeros((v_node_num + index, v_node_num + index), dtype=dtype), np.zeros((v_node_num + index, 1),
-                                                                                         dtype=dtype)
 
     # TODO:modify the following bad logic
+    def handle_cmds(self):
+        commands = self.tree.children[2]
+        rst=[]
+        for command in commands.children:
+            if command.data == "command":
+                cmd_tree = command.children[0]
+                if cmd_tree.data == 'acdef':
+                    rst.append(ac_handler(self,get_ac(cmd_tree)))
+                elif cmd_tree.data == 'dcdef':
+                    rst.append(dc_handler(self,get_dc(cmd_tree)))
+                else:
+                    pass
 
-    # This is a naive dc solver just for test
-    def ac_handler(self, task):
-        rst = self.ac_solver(3000)
-        self.put_rst(rst)
-        for n in self.nodeDict.values():
-            print(n.name, n.get_voltage())
-        # for element in self.elements.values():
-        #     print(element.name, element.get_dc_current())
 
-    def ac_solver(self, freq):
-        a, b = self.generate_linear_equation('ac')
-        for i in self.elements.values():
-            i.make_stamp(a, b, freq)
-        print(a)
-        print(b)
-        ground_node = self.nodeDict["0"].num
-        index = list(range(len(a)))
-        index.remove(ground_node)
-        a, b = a[np.ix_(index, index)], b[np.ix_(index, [0])]
-        rst = list(np.linalg.solve(a, b))
-        rst.insert(ground_node, [0])
-        return np.array(rst)
-
-    # This is a naive dc solver just for test
-    def dc_handler(self, task):
-        rst = self.dc_solver()
-        self.put_rst(rst)
-        for n in self.nodeDict.values():
-            print(n.name, n.get_voltage())
-        for element in self.elements.values():
-            print(element.name, element.get_dc_current())
-
-    # This part also need to modify
-    def put_rst(self, rst_mat):
-        for i in self.nodeDict.values():
-            i.put_voltage(rst_mat[i.num][0])
-        # for i in self.elements.values():
-        #     if hasattr(i, "index"):
-        #         i.put_dc_current(rst_mat[i.index][0])
-
-    # This part also need to modify
-    def dc_solver(self):
-        return self.ac_solver(0)
-        # a, b = self.generate_linear_equation()
-        # for i in self.elements.values():
-        #     i.make_stamp(a, b, 0)
-        # ground_node = self.nodeDict["0"].num
-        # index = list(range(len(a)))
-        # index.remove(ground_node)
-        # a, b = a[np.ix_(index, index)], b[np.ix_(index, [0])]
-        # rst = list(np.linalg.solve(a, b))
-        # rst.insert(ground_node, [0])
-        # return np.array(rst)
