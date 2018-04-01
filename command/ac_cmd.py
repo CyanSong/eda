@@ -1,41 +1,53 @@
-import numpy as np
+import functools
+from multiprocessing import Pool
+
 from basic import *
-from multiprocessing.pool import ThreadPool
-from time import time
+from command.task import task
 
 
-def get_ac(cmd):
-    task = dict()
-    if len(cmd.children) == 4:
-        task['mode'] = cmd.children[0]
-        task['number'] = parse_value(cmd.children[1], int)
-        task['start'] = parse_value(cmd.children[2], float)
-        task['stop'] = parse_value(cmd.children[3], float)
+class ac_task(task):
+    def __init__(self, number, start, stop, mode='dec'):
+        self.mode = mode
+        self.number = number
+        self.start = start
+        self.stop = stop
+
+    # TODO:need to modify to sopport more mode
+    def generate_seq(self):
+        return [self.start + (self.stop - self.start) / self.number * i for i in range(self.number)]
+
+
+def get_ac_task(cmd):
+    if len(cmd.children) == 3:
+        return ac_task(parse_value(cmd.children[0], int), parse_value(cmd.children[1], float),
+                       parse_value(cmd.children[2], float))
     else:
-        task['mode'] = 'dec'
-        task['number'] = parse_value(cmd.children[0], int)
-        task['start'] = parse_value(cmd.children[1], float)
-        task['stop'] = parse_value(cmd.children[2], float)
-    return task
+        return ac_task(parse_value(cmd.children[1], int), parse_value(cmd.children[2], float),
+                       parse_value(cmd.children[3], float), cmd.children[0])
 
 
-# This is a naive dc solver just for test
-def ac_handler(net, task):
-    arg = [(net, task['start'] + (task['stop'] - task['start']) / task['number'] * i) for i in range(task['number'])]
-    with ThreadPool(4) as pool:
-        rst = pool.starmap(ac_solver, arg)
+def ac_handler(net, t):
+    ground_node = net.node_dict["0"].num
+    basic_len = len(net.node_dict)
+    elements = net.elements
+    arg = t.generate_seq()
+    solver = functools.partial(ac_solver, ground_node, basic_len, elements)
+
+    if len(arg) * len(elements) ** 2 > 125000:
+        with Pool(4) as pool:
+            rst = pool.map(solver, arg)
+    else:
+        rst = [solver(i) for i in arg]
     return rst
 
 
-def ac_solver(net, freq):
-    a, b = generate_linear_equation(net, 'ac')
-    for i in net.elements.values():
+def ac_solver(ground_node, basic_len, elements_dict, freq):
+    a, b = generate_linear_equation(basic_len, elements_dict, 'ac')
+    for i in elements_dict.values():
         i.make_stamp(a, b, freq)
-    ground_node = net.node_dict["0"].num
     index = list(range(len(a)))
     index.remove(ground_node)
     a, b = a[np.ix_(index, index)], b[np.ix_(index, [0])]
-    print("MNA",a,b)
     rst = list(np.linalg.solve(a, b))
     rst.insert(ground_node, [0])
-    return np.array(rst)
+    return np.array(rst)[:, 0]

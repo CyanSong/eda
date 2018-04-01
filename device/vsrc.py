@@ -1,6 +1,7 @@
-from device.linear_device import linear_device
-from basic import *
 from cmath import rect
+
+from basic import *
+from device.linear_device import linear_device
 
 
 def get_vsrc(element_tree, node_dict):
@@ -33,10 +34,13 @@ class vsrc(linear_device):
     def put_index(self, index):
         self.index = index
 
+    def del_index(self):
+        self.index = None
+
     def get_current(self, rst_vec, freq=0):
         return rst_vec[self.index][0]
 
-    def make_stamp(self, mat, vec, freq=None):
+    def make_stamp(self, mat, vec, freq=0, val=None):
         assert (self.index is not None)
         mat[self.index][self.pos_node.num] += 1
         mat[self.index][self.neg_node.num] -= 1
@@ -44,7 +48,8 @@ class vsrc(linear_device):
         mat[self.neg_node.num][self.index] -= 1
         if freq == 0:
             assert (self.val is not None)
-            vec[self.index] = self.val + vec[self.index]
+            val = self.val if val is None else val
+            vec[self.index] = val + vec[self.index]
         else:
             assert (self.ac_val is not None)
             vec[self.index] = self.ac_val + vec[self.index]

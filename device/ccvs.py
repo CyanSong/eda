@@ -1,5 +1,5 @@
-from device.linear_device import linear_device
 from basic import *
+from device.linear_device import linear_device
 
 
 def get_ccvs(element_tree, node_dict):
@@ -15,15 +15,17 @@ class ccvs(linear_device):
         linear_device.__init__(self, name, pos_node, neg_node, val)
         self.v_src = v_src
         self.index = None
-        self.current = None
 
     def put_index(self, index):
         self.index = index
 
+    def del_index(self):
+        self.index = None
+
     def get_current(self, rst_vec, freq=0):
         return rst_vec[self.index][0]
 
-    def make_stamp(self, mat, vec=None, freq=None):
+    def make_stamp(self, mat, vec, freq=0):
         index = self.v_src.index
         assert (self.index is not None and index is not None)
         mat[self.index][index] -= self.val

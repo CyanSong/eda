@@ -1,5 +1,5 @@
-from device.linear_device import linear_device
 from basic import *
+from device.linear_device import linear_device
 
 
 def get_vcvs(element_tree, node_dict):
@@ -20,10 +20,13 @@ class vcvs(linear_device):
     def put_index(self, index):
         self.index = index
 
+    def del_index(self):
+        self.index=None
+
     def get_current(self, rst_vec, freq=0):
         return rst_vec[self.index][0]
 
-    def make_stamp(self, mat, vec=None, freq=None):
+    def make_stamp(self, mat, vec, freq=0):
         assert (self.index is not None)
         mat[self.index][self.pos_node.num] += 1
         mat[self.index][self.neg_node.num] -= 1

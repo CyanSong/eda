@@ -1,5 +1,5 @@
-from device.linear_device import linear_device
 from basic import *
+from device.linear_device import linear_device
 
 
 def get_isrc(element_tree, node_dict):
@@ -13,10 +13,11 @@ class isrc(linear_device):
     def __init__(self, name, pos_node, neg_node, val):
         linear_device.__init__(self, name, pos_node, neg_node, val)
 
-    def make_stamp(self, mat, vec, freq=None):
+    def make_stamp(self, mat, vec, freq=0, val=None):
         assert (self.pos_node.num < len(vec) and self.pos_node.num < len(vec))
-        vec[self.pos_node.num][0] -= self.val
-        vec[self.neg_node.num][0] += self.val
+        val = self.val if val is None else val
+        vec[self.pos_node.num][0] -= val
+        vec[self.neg_node.num][0] += val
 
-    def get_current(self):
+    def get_current(self, rst_vec):
         return self.val

@@ -1,5 +1,5 @@
-from device.linear_device import linear_device
 from basic import *
+from device.linear_device import linear_device
 
 
 def get_cccs(element_tree, node_dict):
@@ -15,7 +15,7 @@ class cccs(linear_device):
         linear_device.__init__(self, name, pos_node, neg_node, val)
         self.v_src = v_src
 
-    def make_stamp(self, mat, vec=None, freq=None):
+    def make_stamp(self, mat, vec, freq=0):
         index = self.v_src.index
         mat[self.pos_node.num][index] += self.val
         mat[self.neg_node.num][index] -= self.val

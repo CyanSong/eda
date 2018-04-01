@@ -1,18 +1,17 @@
-from spice_parser import *
-from error import *
-from basic import *
-import numpy as np
-from device.vcvs import vcvs, get_vcvs
-from device.ccvs import ccvs, get_ccvs
-from device.cccs import cccs, get_cccs
-from device.vccs import vccs, get_vccs
-from device.res import res, get_res
-from device.vsrc import vsrc, get_vsrc
-from device.isrc import isrc, get_isrc
-from device.cap import cap, get_cap
-from device.ind import ind, get_ind
 from command.ac_cmd import *
 from command.dc_cmd import *
+from command.tran_cmd import *
+from device.cap import get_cap
+from device.cccs import cccs, get_cccs
+from device.ccvs import ccvs, get_ccvs
+from device.ind import get_ind
+from device.isrc import get_isrc
+from device.res import get_res
+from device.vccs import get_vccs
+from device.vcvs import get_vcvs
+from device.vsrc import get_vsrc
+from error import *
+from spice_parser import *
 
 
 class network():
@@ -71,8 +70,10 @@ class network():
             if command.data == "command":
                 cmd_tree = command.children[0]
                 if cmd_tree.data == 'acdef':
-                    rst.append(ac_handler(self, get_ac(cmd_tree)))
+                    rst.append(ac_handler(self, get_ac_task(cmd_tree)))
                 elif cmd_tree.data == 'dcdef':
-                    rst.append(dc_handler(self, get_dc(cmd_tree)))
+                    rst.append(dc_handler(self, get_dc_task(cmd_tree)))
+                elif cmd_tree.data == 'trandef':
+                    rst.append(tran_handler(self, get_tran_task(cmd_tree)))
                 else:
                     pass

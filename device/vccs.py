@@ -1,5 +1,5 @@
-from device.linear_device import linear_device
 from basic import *
+from device.linear_device import linear_device
 
 
 def get_vccs(element_tree, node_dict):
@@ -15,7 +15,7 @@ class vccs(linear_device):
         self.ctl_neg_node = ctl_neg_node
         self.ctl_pos_node = ctl_pos_node
 
-    def make_stamp(self, mat, vec=None, freq=None):
+    def make_stamp(self, mat, vec, freq=0):
         assert (max(self.pos_node.num, self.neg_node.num, self.ctl_neg_node.num, self.ctl_pos_node.num) < len(mat))
         mat[self.pos_node.num][self.ctl_pos_node.num] += self.val
         mat[self.pos_node.num][self.ctl_neg_node.num] -= self.val

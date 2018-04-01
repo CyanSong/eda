@@ -1,5 +1,6 @@
-from lark import Lark
 import re
+
+from lark import Lark
 
 
 # from lark.tree import pydot__tree_to_png  # Just a neat utility function
@@ -8,6 +9,7 @@ def pre_compile(source):
 
 
 spice_parser = Lark(r"""
+
     circuits: title definition [commands] end
     title:  NONSENSE ["\r"]"\n"
     definition: ( element | comment )+
@@ -16,7 +18,7 @@ spice_parser = Lark(r"""
     
     comment: "*" NONSENSE (["\r"]"\n") 
     element: (res | cap | vsrc | isrc | induc | vccs | vcvs | ccvs| cccs) ["\r"]"\n"
-    command: "." (plot | acdef | dcdef)+ (["\r"]"\n")
+    command: "." (plot | acdef | dcdef | trandef)+ (["\r"]"\n")
     
     res: "r" ELEMENTNAME  pospoint  negpoint value  
     cap: "c" ELEMENTNAME  pospoint negpoint value 
@@ -27,6 +29,10 @@ spice_parser = Lark(r"""
     vcvs: "e" ELEMENTNAME pospoint negpoint ctlpospnt ctlnegpnt value
     cccs: "f" ELEMENTNAME pospoint negpoint vname value
     ccvs:"h" ELEMENTNAME pospoint negpoint vname value
+    dcdef: "dc" dsrc1 [dsrc2]
+    acdef: "ac"  [type] pernumber fstart fstop
+    trandef: "tran" incr stop [start [max_int]]
+    
     
     spec:   ["dc"] dvalue           ->vdc 
         | "ac" [amag [aphase]] ->vac
@@ -37,24 +43,19 @@ spice_parser = Lark(r"""
     ?negpoint: POINT
     ?ctlpospnt:POINT 
     ?ctlnegpnt:POINT
-    ?src1:src
-    ?src2:src
     ?fstart: value
     ?fstop: value
-    ?start1: value
-    ?start2: value
-    ?stop1: value
-    ?stop2: value
-    ?incr1: value
-    ?incr2: value
-
-    dcdef: "dc" src1 start1 stop1 incr1 [src2 start2 stop2 incr2]
-    acdef: "ac"  [type] pernumber fstart fstop
+    ?start: value
+    ?stop: value
+    ?incr: value
+    ?max_int : value
+    ?dsrc1:dsrc
+    ?dsrc2:dsrc
+    dsrc:src start stop incr
     type:  "dec"  -> dec
             | "lin" -> lin
             |"oct"  -> oct
     pernumber: INT
-
     plot: "plot" mode (variable)+
     ?mode: "ac" -> ac
          | "dc" -> dc
@@ -73,7 +74,6 @@ spice_parser = Lark(r"""
     src: vi ELEMENTNAME
     vname: "v" ELEMENTNAME
     value: NUMBER [UNIT]
-
     NONSENSE:/[^\n]+/
     ELEMENTNAME: /([0-9]|[a-z])+/
     UNIT: "k" | "p" | "n" | "u" | "m" | "f"|"meg"|"g"|"t"|"db" 

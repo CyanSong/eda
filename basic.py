@@ -34,13 +34,13 @@ class node():
         return rst_vec[self.num][0]
 
 
-def generate_linear_equation(net, ac_dc="dc"):
+def generate_linear_equation(basic_len, elements, mode):
     index = 0
-    v_node_num = len(net.node_dict)
-    for i in net.elements.values():
-        if hasattr(i, "index"):
+    v_node_num = basic_len
+    for i in elements.values():
+        if hasattr(i, "index") or (hasattr(i, "tran_index") and mode == 'tran'):
             i.put_index(index + v_node_num)
             index += 1
-    dtype = np.float64 if ac_dc == "dc" else np.complex128
+    dtype = np.complex128 if mode == "ac" else np.float64
     return np.zeros((v_node_num + index, v_node_num + index), dtype=dtype), np.zeros((v_node_num + index, 1),
                                                                                      dtype=dtype)
