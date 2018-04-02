@@ -39,7 +39,7 @@ class display_handler(handler):
                     raise net_definition_error("this element {} is not defined".format(var.element_name))
                 val_diff = (device.pos_node.name, device.neg_node.name)
             try:
-                val_diff = (self.net.node_dict[val_diff[0]], self.net.node_dict[val_diff[1]])
+                val_diff = (self.net.node_dict[val_diff[0]].num, self.net.node_dict[val_diff[1]].num)
             except KeyError:
                 raise net_definition_error("this node {} or node {} is not defined".format(val_diff[0], val_diff[1]))
             val_diff_rst = [val[val_diff[0]] - val[val_diff[1]] for val in rst]

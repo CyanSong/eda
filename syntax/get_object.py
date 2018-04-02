@@ -86,11 +86,15 @@ def get_vsrc(element_tree, node_dict):
         return vsrc(name, nodes[0], nodes[1], src_type, ac_mag=ac_mag, ac_phase=ac_phase)
 
 
+get_device = {'vsrc': get_vsrc, 'cap': get_cap, 'ind': get_ind, 'isrc': get_isrc, 'vccs': get_vccs, 'vcvs': get_vcvs,
+              'ccvs': get_ccvs, 'cccs': get_cccs, 'res': get_res}
+
+
 def get_variable(variable_tree):
     point_of_val = variable_tree.children[-1]
     if point_of_val.data == 'valofpoint':
         element_name = None
-        val_diff = (point_of_val.children[0].value, 0)
+        val_diff = (point_of_val.children[0].value, '0')
     elif point_of_val.data == 'diffofpoint':
         element_name = None
         val_diff = (point_of_val.children[0].value, point_of_val.children[1].value)

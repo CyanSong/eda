@@ -44,24 +44,8 @@ class network():
         return elements, node_dict
 
     def add_element(self, element, node_dict):
-        if element.data == 'res':
-            return get_res(element, node_dict)
-        elif element.data == 'vccs':
-            return get_vccs(element, node_dict)
-        elif element.data == 'isrc':
-            return get_isrc(element, node_dict)
-        elif element.data == 'vsrc':
-            return get_vsrc(element, node_dict)
-        elif element.data == 'cccs':
-            return get_cccs(element, node_dict)
-        elif element.data == 'vcvs':
-            return get_vcvs(element, node_dict)
-        elif element.data == 'ccvs':
-            return get_ccvs(element, node_dict)
-        elif element.data == 'cap':
-            return get_cap(element, node_dict)
-        elif element.data == "induc":
-            return get_ind(element, node_dict)
+        element_type = element.data
+        return get_device[element_type](element, node_dict)
 
     def handle_cmds(self):
         commands = self.tree.children[2]

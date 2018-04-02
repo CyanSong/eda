@@ -7,7 +7,6 @@ class vcvs(linear_device):
         self.ctl_neg_node = ctl_neg_node
         self.ctl_pos_node = ctl_pos_node
         self.index = None
-        self.current = None
 
     def put_index(self, index):
         self.index = index
