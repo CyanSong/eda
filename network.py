@@ -1,27 +1,25 @@
 from command.ac_cmd import *
 from command.dc_cmd import *
 from command.tran_cmd import *
-from device.cap import get_cap
-from device.cccs import cccs, get_cccs
-from device.ccvs import ccvs, get_ccvs
-from device.ind import get_ind
-from device.isrc import get_isrc
-from device.res import get_res
-from device.vccs import get_vccs
-from device.vcvs import get_vcvs
-from device.vsrc import get_vsrc
+from command.display import *
+from syntax.get_object import *
+from device.cccs import cccs
+from device.ccvs import ccvs
+
 from error import *
-from spice_parser import *
+from syntax.spice_parser import *
 
 
 class network():
     def __init__(self, code):
         code = pre_compile(code)
         self.parser = spice_parser
+        self.parser.parse(code)
         try:
             self.tree = self.parser.parse(code)
         except Exception:
             raise parser_syntax_error("bad syntax!")
+        print(self.tree)
         self.elements, self.node_dict = self.build()
         self.handle_cmds()
 
@@ -65,15 +63,19 @@ class network():
 
     def handle_cmds(self):
         commands = self.tree.children[2]
-        rst = []
+        rst = dict()
         for command in commands.children:
             if command.data == "command":
                 cmd_tree = command.children[0]
                 if cmd_tree.data == 'acdef':
-                    rst.append(ac_handler(self, get_ac_task(cmd_tree)))
+                    rst['ac'] = ac_handler(self, get_ac_task(cmd_tree))
                 elif cmd_tree.data == 'dcdef':
-                    rst.append(dc_handler(self, get_dc_task(cmd_tree)))
+                    rst['dc'] = dc_handler(self, get_dc_task(cmd_tree))
                 elif cmd_tree.data == 'trandef':
-                    rst.append(tran_handler(self, get_tran_task(cmd_tree)))
+                    rst['tran'] = tran_handler(self, get_tran_task(cmd_tree))
+                elif cmd_tree.data == 'plot':
+                    plot_handler(self, get_display_task(cmd_tree, 'plot'), rst).handle()
+                elif cmd_tree.data == 'print':
+                    print_handler(self, get_display_task(cmd_tree, 'print'), rst).handle()
                 else:
                     pass

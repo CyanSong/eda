@@ -1,12 +1,4 @@
-from basic import *
 from device.linear_device import linear_device
-
-
-def get_isrc(element_tree, node_dict):
-    nodes = remap_node([i.value for i in element_tree.children[1:3]], node_dict)
-    name = "i" + element_tree.children[0].value
-    val = parse_value(element_tree.children[3])
-    return isrc(name, nodes[0], nodes[1], val)
 
 
 class isrc(linear_device):
