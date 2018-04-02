@@ -5,7 +5,6 @@ from command.display import *
 from syntax.get_object import *
 from device.cccs import cccs
 from device.ccvs import ccvs
-
 from error import *
 from syntax.spice_parser import *
 
@@ -14,12 +13,11 @@ class network():
     def __init__(self, code):
         code = pre_compile(code)
         self.parser = spice_parser
-        self.parser.parse(code)
         try:
             self.tree = self.parser.parse(code)
-        except Exception:
+        except Exception as err:
+            print(err)
             raise parser_syntax_error("bad syntax!")
-        print(self.tree)
         self.elements, self.node_dict = self.build()
         self.handle_cmds()
 
@@ -38,7 +36,11 @@ class network():
             raise net_definition_error("You must assign the ground node as 0!")
         for element in elements.values():
             if isinstance(element, ccvs) or isinstance(element, cccs):
-                element.v_src = elements["v" + element.v_src.children[0].value]
+                vname = "v" + element.v_src.children[0].value
+                try:
+                    element.v_src = elements[vname]
+                except KeyError:
+                    raise net_definition_error("this element {} is not defined".format(vname))
         return elements, node_dict
 
     def add_element(self, element, node_dict):

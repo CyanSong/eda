@@ -2,7 +2,7 @@ import network as nt
 
 
 def test():
-    circuits = open("spice.sp")
+    circuits = open("test_netlist/spice.sp")
     circuits = circuits.read()
     r = nt.network(circuits)
 
