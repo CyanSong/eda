@@ -1,12 +1,4 @@
-from basic import *
 from device.linear_device import linear_device
-
-
-def get_ind(element_tree, node_dict):
-    nodes = remap_node([i.value for i in element_tree.children[1:3]], node_dict)
-    name = "l" + element_tree.children[0].value
-    val = parse_value(element_tree.children[3])
-    return ind(name, nodes[0], nodes[1], val)
 
 
 class ind(linear_device):
@@ -45,4 +37,4 @@ class ind(linear_device):
                 vec[self.index][0] -= (2 * h_L * v_last + i_last)
 
     def get_current(self, rst_vec, freq=0):
-        return rst_vec[self.index][0]
+        return rst_vec[self.index]

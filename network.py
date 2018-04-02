@@ -1,17 +1,12 @@
 from command.ac_cmd import *
 from command.dc_cmd import *
 from command.tran_cmd import *
-from device.cap import get_cap
-from device.cccs import cccs, get_cccs
-from device.ccvs import ccvs, get_ccvs
-from device.ind import get_ind
-from device.isrc import get_isrc
-from device.res import get_res
-from device.vccs import get_vccs
-from device.vcvs import get_vcvs
-from device.vsrc import get_vsrc
+from command.display import *
+from syntax.get_object import *
+from device.cccs import cccs
+from device.ccvs import ccvs
 from error import *
-from spice_parser import *
+from syntax.spice_parser import *
 
 
 class network():
@@ -20,7 +15,8 @@ class network():
         self.parser = spice_parser
         try:
             self.tree = self.parser.parse(code)
-        except Exception:
+        except Exception as err:
+            print(err)
             raise parser_syntax_error("bad syntax!")
         self.elements, self.node_dict = self.build()
         self.handle_cmds()
@@ -40,40 +36,32 @@ class network():
             raise net_definition_error("You must assign the ground node as 0!")
         for element in elements.values():
             if isinstance(element, ccvs) or isinstance(element, cccs):
-                element.v_src = elements["v" + element.v_src.children[0].value]
+                vname = "v" + element.v_src.children[0].value
+                try:
+                    element.v_src = elements[vname]
+                except KeyError:
+                    raise net_definition_error("this element {} is not defined".format(vname))
         return elements, node_dict
 
     def add_element(self, element, node_dict):
-        if element.data == 'res':
-            return get_res(element, node_dict)
-        elif element.data == 'vccs':
-            return get_vccs(element, node_dict)
-        elif element.data == 'isrc':
-            return get_isrc(element, node_dict)
-        elif element.data == 'vsrc':
-            return get_vsrc(element, node_dict)
-        elif element.data == 'cccs':
-            return get_cccs(element, node_dict)
-        elif element.data == 'vcvs':
-            return get_vcvs(element, node_dict)
-        elif element.data == 'ccvs':
-            return get_ccvs(element, node_dict)
-        elif element.data == 'cap':
-            return get_cap(element, node_dict)
-        elif element.data == "induc":
-            return get_ind(element, node_dict)
+        element_type = element.data
+        return get_device[element_type](element, node_dict)
 
     def handle_cmds(self):
         commands = self.tree.children[2]
-        rst = []
+        rst = dict()
         for command in commands.children:
             if command.data == "command":
                 cmd_tree = command.children[0]
                 if cmd_tree.data == 'acdef':
-                    rst.append(ac_handler(self, get_ac_task(cmd_tree)))
+                    rst['ac'] = ac_handler(self, get_ac_task(cmd_tree))
                 elif cmd_tree.data == 'dcdef':
-                    rst.append(dc_handler(self, get_dc_task(cmd_tree)))
+                    rst['dc'] = dc_handler(self, get_dc_task(cmd_tree))
                 elif cmd_tree.data == 'trandef':
-                    rst.append(tran_handler(self, get_tran_task(cmd_tree)))
+                    rst['tran'] = tran_handler(self, get_tran_task(cmd_tree))
+                elif cmd_tree.data == 'plot':
+                    plot_handler(self, get_display_task(cmd_tree, 'plot'), rst).handle()
+                elif cmd_tree.data == 'print':
+                    print_handler(self, get_display_task(cmd_tree, 'print'), rst).handle()
                 else:
                     pass

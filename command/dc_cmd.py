@@ -1,46 +1,24 @@
 import functools
-import logging
 from multiprocessing import Pool
-
 from basic import *
-from command.task import task
+from command.task import *
+from command.handler import handler
 
 
-class dc_task(task):
-    def __init__(self, src1, start1, stop1, incr1, src2=None, start2=None, stop2=None, incr2=None):
-        self.src1, self.start1, self.stop1, self.incr1 = src1, start1, stop1, incr1
-        if src2 is not None:
-            self.src2, self.start2, self.stop2, self.incr2 = src2, start2, stop2, incr2
+class dc_handler(handler):
+    def __init__(self, net, t):
+        handler.__init__(self, net, t)
 
-    def generate_seq(self):
-        return list(np.arange(self.start1, self.stop1, self.incr1))
-
-
-def get_dc_task(cmd_tree):
-    if len(cmd_tree.children) == 1:
-        src = cmd_tree.children[0].children[0]
-        vsrc = src.children[0].data + src.children[1].value
-        dsrc = [parse_value(i, float) for i in cmd_tree.children[0].children[1:]]
-        return dc_task(vsrc, dsrc[0], dsrc[1], dsrc[2])
-    else:
-        pass
-
-
-def dc_handler(net, t):
-    ground_node = net.node_dict["0"].num
-    basic_len = len(net.node_dict)
-    elements = net.elements
-    arg = t.generate_seq()
-    vname = t.src1
-    solver = functools.partial(dc_solver, ground_node, basic_len, elements, vname)
-
-    if len(arg) * len(elements) ** 2 > 125000:
-        with Pool(4) as pool:
-            rst = pool.map(solver, arg)
-    else:
-        rst = [solver(i) for i in arg]
-    logging.debug(rst)
-    return rst
+    def handle(self):
+        ground_node, basic_len, elements, seq = handler.handle(self)
+        vname = self.task.src1
+        solver = functools.partial(dc_solver, ground_node, basic_len, elements, vname)
+        if len(seq) * len(elements) ** 2 > 125000:
+            with Pool(4) as pool:
+                rst = pool.map(solver, seq)
+        else:
+            rst = [solver(i) for i in seq]
+        return rst
 
 
 def dc_solver(ground_node, basic_len, elements_dict, vname=None, val=None):

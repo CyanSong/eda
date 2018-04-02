@@ -1,13 +1,4 @@
-from basic import *
 from device.linear_device import linear_device
-
-
-def get_ccvs(element_tree, node_dict):
-    nodes = remap_node([i.value for i in element_tree.children[1:3]], node_dict)
-    name = "h" + element_tree.children[0].value
-    val = parse_value(element_tree.children[4])
-    vsrc_name = element_tree.children[3]
-    return ccvs(name, nodes[0], nodes[1], vsrc_name, val)
 
 
 class ccvs(linear_device):
@@ -23,7 +14,7 @@ class ccvs(linear_device):
         self.index = None
 
     def get_current(self, rst_vec, freq=0):
-        return rst_vec[self.index][0]
+        return rst_vec[self.index]
 
     def make_stamp(self, mat, vec, freq=0):
         index = self.v_src.index

@@ -1,23 +1,5 @@
 from cmath import rect
-
-from basic import *
 from device.linear_device import linear_device
-
-
-def get_vsrc(element_tree, node_dict):
-    nodes = remap_node([i.value for i in element_tree.children[1:3]], node_dict)
-    name = "v" + element_tree.children[0].value
-    spec = element_tree.children[3]
-
-    if spec.data == 'vdc':
-        src_type = 'dc'
-        dc_val = parse_value(spec.children[-1], float)
-        return vsrc(name, nodes[0], nodes[1], src_type=src_type, dc_val=dc_val)
-    else:
-        src_type = 'ac'
-        ac_mag = parse_value(spec.children[0]) if len(spec.children) > 0 else 0
-        ac_phase = parse_value(spec.children[1]) if len(spec.children) > 1 else 0
-        return vsrc(name, nodes[0], nodes[1], src_type, ac_mag=ac_mag, ac_phase=ac_phase)
 
 
 class vsrc(linear_device):
@@ -38,7 +20,7 @@ class vsrc(linear_device):
         self.index = None
 
     def get_current(self, rst_vec, freq=0):
-        return rst_vec[self.index][0]
+        return rst_vec[self.index]
 
     def make_stamp(self, mat, vec, freq=0, val=None):
         assert (self.index is not None)
