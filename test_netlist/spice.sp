@@ -6,6 +6,6 @@ r2 2 1 2
 g5 1 0 2 1 4
 v3 1 2 3
 r4 2 0 8
-.tran .2 200 0 0.01
-.plot tran v(2)
+.tran .2 1000 0 0.01
+.print tran v(2) i(v3)
 .end

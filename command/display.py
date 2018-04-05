@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+from matplotlib import interactive
+
 from command.handler import *
 from error import net_definition_error
 
@@ -67,8 +69,11 @@ class plot_handler(display_handler):
     # TODO modify to support GUI
     def handle(self):
         rst = super().handle()
-        for single_rst in rst:
-            plt.plot(single_rst[0], single_rst[1])
+        if len(rst) > 1:
+            plt.subplot()
+            for i, single_rst in enumerate(rst):
+                plt.plot(single_rst[0], single_rst[1])
+            interactive(False)
             plt.show()
 
 
