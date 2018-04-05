@@ -74,7 +74,10 @@ class Example(QWidget):
     def run_simulation(self):
         circuit = self.netlist_edit.toPlainText()
         if circuit:
-            rst = nt.network(circuit)
+            try:
+                rst = nt.network(circuit)
+            except Exception as e:
+                QMessageBox.information(self,'Error',str(e))
 
 
 if __name__ == '__main__':
