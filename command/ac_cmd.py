@@ -1,7 +1,7 @@
 import functools
 from multiprocessing import Pool
-from basic import *
-from command.task import *
+
+from command.basic_solver import basic_solver
 from command.handler import handler
 
 
@@ -10,24 +10,18 @@ class ac_handler(handler):
         handler.__init__(self, net, t)
 
     def handle(self):
+        print("Begin the ac simulation.")
         ground_node, basic_len, elements, seq = handler.handle(self)
-        solver = functools.partial(ac_solver, ground_node, basic_len, elements)
+        solver = functools.partial(ac_solver, ground_node, basic_len, elements, self.net.linear)
 
         if len(seq) * len(elements) ** 2 > 125000:
             with Pool(4) as pool:
                 rst = pool.map(solver, seq)
         else:
             rst = [solver(i) for i in seq]
+        print("Finish the dc simulation.")
         return rst
 
 
-def ac_solver(ground_node, basic_len, elements_dict, freq):
-    a, b = generate_linear_equation(basic_len, elements_dict, 'ac')
-    for i in elements_dict.values():
-        i.make_stamp(a, b, freq)
-    index = list(range(len(a)))
-    index.remove(ground_node)
-    a, b = a[np.ix_(index, index)], b[np.ix_(index, [0])]
-    rst = list(np.linalg.solve(a, b))
-    rst.insert(ground_node, [0])
-    return np.array(rst)[:, 0]
+def ac_solver(ground_node, basic_len, elements_dict, linear, freq):
+    return basic_solver(ground_node, basic_len, elements_dict, 'ac', linear, freq=freq)

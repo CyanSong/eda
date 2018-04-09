@@ -1,9 +1,9 @@
-from device.linear_device import linear_device
+from device.device import *
 
 
 class ind(linear_device):
     def __init__(self, name, pos_node, neg_node, val):
-        linear_device.__init__(self, name, pos_node, neg_node, val)
+        double_port_device.__init__(self, name, pos_node, neg_node, val)
         self.index = None
 
     def put_index(self, index):
@@ -12,7 +12,7 @@ class ind(linear_device):
     def del_index(self):
         self.index = None
 
-    def make_stamp(self, mat, vec, freq):
+    def make_stamp(self, mat, vec, freq=0):
         assert (self.index is not None)
         sl = self.val * (complex(0, freq) if freq != 0 else 0)
         mat[self.index][self.index] -= sl

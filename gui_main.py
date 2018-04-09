@@ -1,9 +1,12 @@
 import sys
 
+from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import (QWidget, QPushButton, QTextEdit, QFileDialog,
                              QHBoxLayout, QVBoxLayout, QApplication, QMessageBox)
 
 import network as nt
+from error import external_error
+from log import OutLog
 
 
 class Example(QWidget):
@@ -24,8 +27,11 @@ class Example(QWidget):
 
         schematic_btn = QPushButton("See schematic")
         self.netlist_edit = QTextEdit()
-        rst_form = QTextEdit()
-        rst_form.setReadOnly(True)
+        self.rst_form = QTextEdit()
+        self.rst_form.setReadOnly(True)
+
+        sys.stdout = OutLog(self.rst_form, sys.stdout)
+        sys.stderr = OutLog(self.rst_form, sys.stderr, QColor(255, 0, 0))
 
         btn_box = QVBoxLayout()
         btn_box.addWidget(load_btn)
@@ -41,7 +47,7 @@ class Example(QWidget):
 
         whole = QVBoxLayout()
         whole.addLayout(input_box, 2)
-        whole.addWidget(rst_form, 1)
+        whole.addWidget(self.rst_form, 1)
 
         self.setLayout(whole)
 
@@ -72,12 +78,15 @@ class Example(QWidget):
                 spice_file.write(self.netlist_edit.toPlainText())
 
     def run_simulation(self):
+        self.rst_form.setText("")
+
         circuit = self.netlist_edit.toPlainText()
         if circuit:
             try:
                 rst = nt.network(circuit)
-            except Exception as e:
-                QMessageBox.information(self,'Error',str(e))
+            except external_error as e:
+                self.rst_form.append("Error:{}".format(str(e)))
+                QMessageBox.information(self, 'Error', str(e))
 
 
 if __name__ == '__main__':

@@ -1,10 +1,11 @@
 from cmath import rect
-from device.linear_device import linear_device
+
+from device.device import *
 
 
 class vsrc(linear_device):
     def __init__(self, name, pos_node, neg_node, src_type="dc", dc_val=None, ac_mag=0, ac_phase=0, func=None):
-        linear_device.__init__(self, name, pos_node, neg_node, dc_val)
+        double_port_device.__init__(self, name, pos_node, neg_node, dc_val)
         self.src_type = src_type
         if src_type == "ac":
             self.ac_val = rect(ac_mag, ac_phase)

@@ -1,11 +1,18 @@
 title
 
 *netlist example 1
-c1 1 0 5
-r2 2 1 2
-g5 1 0 2 1 4
-v3 1 2 3
-r4 2 0 8
-.tran .2 1000 0 0.01
-.print tran v(2) i(v3)
+r2 2 1  2
+v2 0 1  10
+c1 0 2 1
+
+*.tran .01 2 0 0.002
+*.plot tran v(1) v(2)
+
+.dc v2 -2 4 .2
+.plot dc i(v2)
+
+*.ac 10000 0.1 20
+*.plot ac v(1) v(2)
+
+
 .end

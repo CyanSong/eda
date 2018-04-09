@@ -17,7 +17,7 @@ spice_parser = Lark(r"""
     end:".end" [WS]
     
     comment: "*" NONSENSE (["\r"]"\n") 
-    element: (res | cap | vsrc | isrc | induc | vccs | vcvs | ccvs| cccs) ["\r"]"\n"
+    element: (res | cap | vsrc | isrc | induc | vccs | vcvs | ccvs| cccs |diode) ["\r"]"\n"
     command: "." (plot | acdef | dcdef | trandef| print )+ (["\r"]"\n")
     
     res: "r" ELEMENTNAME  pospoint  negpoint value  
@@ -29,12 +29,16 @@ spice_parser = Lark(r"""
     vcvs: "e" ELEMENTNAME pospoint negpoint ctlpospnt ctlnegpnt value
     cccs: "f" ELEMENTNAME pospoint negpoint vname value
     ccvs:"h" ELEMENTNAME pospoint negpoint vname value
+    diode:"d" ELEMENTNAME pospoint negpoint modelname [area] ["off"] ["ic="vd] 
     dcdef: "dc" dsrc1 [dsrc2]
     acdef: "ac"  [type] pernumber fstart fstop
     trandef: "tran" incr stop [start [max_int]]
     plot: "plot" mode (variable)+
     print: "print" mode (variable)+
     
+    ?area: value
+    ?vd: value
+    ?modelname:ELEMENTNAME
     spec:   ["dc"] dvalue           ->vdc 
         | "ac" [amag [aphase]] ->vac
     ?dvalue:value

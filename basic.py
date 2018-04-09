@@ -31,7 +31,7 @@ class node():
         self.num = number
 
     def get_voltage(self, rst_vec):
-        return rst_vec[self.num][0]
+        return rst_vec[self.num]
 
 
 def generate_linear_equation(basic_len, elements, mode):

@@ -1,15 +1,16 @@
-from device.cap import *
-from device.res import *
-from device.isrc import *
-from device.vsrc import *
-from device.ccvs import *
-from device.cccs import *
-from device.vcvs import *
-from device.vccs import *
-from device.ind import *
 from basic import *
 from command.display import *
 from command.task import *
+from device.cap import *
+from device.cccs import *
+from device.ccvs import *
+from device.diode import *
+from device.ind import *
+from device.isrc import *
+from device.res import *
+from device.vccs import *
+from device.vcvs import *
+from device.vsrc import *
 
 
 def get_res(element_tree, node_dict):
@@ -86,8 +87,20 @@ def get_vsrc(element_tree, node_dict):
         return vsrc(name, nodes[0], nodes[1], src_type, ac_mag=ac_mag, ac_phase=ac_phase)
 
 
+def get_diode(element_tree, node_dict):
+    nodes = remap_node([i.value for i in element_tree.children[1:3]], node_dict)
+    name = "d" + element_tree.children[0].value
+    model_name = element_tree.children[3].value
+    if True:  # modify according to model name
+        if len(element_tree.children) == 5:
+            ic = parse_value(element_tree.children[4], float)
+            return diode(name, nodes[0], nodes[1], ic=ic)
+        else:
+            return diode(name, nodes[0], nodes[1])
+
+
 get_device = {'vsrc': get_vsrc, 'cap': get_cap, 'ind': get_ind, 'isrc': get_isrc, 'vccs': get_vccs, 'vcvs': get_vcvs,
-              'ccvs': get_ccvs, 'cccs': get_cccs, 'res': get_res}
+              'ccvs': get_ccvs, 'cccs': get_cccs, 'res': get_res, 'diode': get_diode}
 
 
 def get_variable(variable_tree):

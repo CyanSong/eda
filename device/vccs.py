@@ -1,11 +1,10 @@
-from basic import *
-from device.linear_device import linear_device
+from device.device import *
 
 
 
 class vccs(linear_device):
     def __init__(self, name, pos_node, neg_node, ctl_pos_node, ctl_neg_node, val):
-        linear_device.__init__(self, name, pos_node, neg_node, val)
+        double_port_device.__init__(self, name, pos_node, neg_node, val)
         self.ctl_neg_node = ctl_neg_node
         self.ctl_pos_node = ctl_pos_node
 

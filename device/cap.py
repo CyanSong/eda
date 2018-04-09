@@ -1,12 +1,12 @@
-from device.linear_device import linear_device
+from device.device import *
 
 
 class cap(linear_device):
     def __init__(self, name, pos_node, neg_node, val):
-        linear_device.__init__(self, name, pos_node, neg_node, val)
+        double_port_device.__init__(self, name, pos_node, neg_node, val)
         self.tran_index = None
 
-    def make_stamp(self, mat, vec, freq):
+    def make_stamp(self, mat, vec, freq=0):
         sc = self.val * (complex(0, freq) if freq != 0 else 0)
         mat[self.pos_node.num][self.pos_node.num] += sc
         mat[self.pos_node.num][self.neg_node.num] -= sc

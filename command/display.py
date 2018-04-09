@@ -30,6 +30,7 @@ class display_handler(handler):
         return [self.get_rst(i) for i in self.task.variable_list]
 
     def get_rst(self, var):
+        print("Fetching the result...")
         rst = self.task_handler.handle()
         seq = self.task_handler.task.generate_seq()
         if var.vi_type == 'v':
@@ -39,11 +40,12 @@ class display_handler(handler):
                     device = self.net.elements[var.element_name]
                 except KeyError:
                     raise net_definition_error("this element {} is not defined".format(var.element_name))
-                val_diff = (device.pos_node.name, device.neg_node.name)
+                val_diff = (device.pos_node.num, device.neg_node.num)
             try:
                 val_diff = (self.net.node_dict[val_diff[0]].num, self.net.node_dict[val_diff[1]].num)
             except KeyError:
                 raise net_definition_error("this node {} or node {} is not defined".format(val_diff[0], val_diff[1]))
+
             val_diff_rst = [val[val_diff[0]] - val[val_diff[1]] for val in rst]
             return seq, val_diff_rst
         else:
@@ -68,13 +70,17 @@ class plot_handler(display_handler):
 
     # TODO modify to support GUI
     def handle(self):
+        print("Begin to plot...")
         rst = super().handle()
         if len(rst) > 1:
             plt.subplot()
             for i, single_rst in enumerate(rst):
                 plt.plot(single_rst[0], single_rst[1])
-            interactive(False)
-            plt.show()
+        else:
+            plt.plot(rst[0][0], rst[0][1])
+        interactive(False)
+        plt.show()
+        print("Finish the plot.")
 
 
 class print_handler(display_handler):
