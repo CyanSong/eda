@@ -1,11 +1,13 @@
 import network as nt
 
 
-def test():
-    circuits = open("test_netlist/spice.sp")
+def test(fileName):
+    circuits = open("test_netlist/"+fileName+".sp")
     circuits = circuits.read()
-    r = nt.network(circuits)
+    nt.network(circuits)
 
 
 if __name__ == "__main__":
-    test()
+    test('dc_test')
+    test('ac_test')
+    test('tran_test')
