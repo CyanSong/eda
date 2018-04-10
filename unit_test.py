@@ -10,4 +10,4 @@ def test(fileName):
 if __name__ == "__main__":
     test('dc_test')
     #test('ac_test')
-    #test('tran_test')
+    test('tran_test')

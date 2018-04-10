@@ -19,7 +19,7 @@ class network():
         print("Begin to parse the netlist...")
         try:
             self.tree = self.parser.parse(self.code)
-            print(self.tree)
+            # print(self.tree)
         except Exception as err:
             raise parser_syntax_error("Bad syntax!\n" + str(err))
         print("Finish the parsing of netlist.")
