@@ -34,7 +34,10 @@ def basic_solver(ground_node, basic_len, elements_dict, type, linear, **kwargs):
     index = list(range(len(a)))
     index.remove(ground_node)
     a, b = a[np.ix_(index, index)], b[np.ix_(index, [0])]
-    new_rst = list(np.linalg.solve(a, b))
+    try:
+        new_rst = list(np.linalg.solve(a, b))
+    except np.linalg.linalg.LinAlgError:
+        raise circuit_error("This circuit is not solvable!")
     new_rst.insert(ground_node, [0])
     new_rst = np.array(new_rst)[:, 0]
 

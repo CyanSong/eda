@@ -115,7 +115,7 @@ def get_variable(variable_tree):
         val_diff = None
         element_name = point_of_val.children[0].data + point_of_val.children[1].value
     if len(variable_tree.children) == 3:
-        part = variable_tree.children[1]
+        part = variable_tree.children[1].data
         return variable(variable_tree.children[0].data, part, val_diff, element_name)
     else:
         return variable(variable_tree.children[0].data, 'whole', val_diff, element_name)

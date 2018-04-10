@@ -7,7 +7,7 @@ c1 0 2 1
 
 
 .ac 10000 0.1 20
-.plot ac v(1) v(2)
+.plot ac vm(1) vm(2)
 
 
 .end

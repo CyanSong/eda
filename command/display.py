@@ -1,3 +1,5 @@
+import cmath
+
 import matplotlib.pyplot as plt
 from matplotlib import interactive
 
@@ -12,8 +14,15 @@ class variable():
     def format_rst(self, rst):
         if self.part == 'whole':
             return rst
+        elif self.part == 'real':
+            return [i.real for i in rst]
+        elif self.part == 'img':
+            return [i.imag for i in rst]
+        elif self.part == 'mag':
+            return [abs(i) for i in rst]
+        elif self.part == 'phase':
+            return [cmath.phase(i)for i in rst]
         else:
-            # TODO: support more format
             pass
 
 
@@ -47,7 +56,7 @@ class display_handler(handler):
                 raise net_definition_error("this node {} or node {} is not defined".format(val_diff[0], val_diff[1]))
 
             val_diff_rst = [val[val_diff[0]] - val[val_diff[1]] for val in rst]
-            return seq, val_diff_rst
+            return seq, var.format_rst(val_diff_rst)
         else:
             try:
                 device = self.net.elements[var.element_name]
@@ -68,7 +77,6 @@ class plot_handler(display_handler):
     def __init__(self, net, t, rst):
         super().__init__(net, t, rst)
 
-    # TODO modify to support GUI
     def handle(self):
         print("Begin to plot...")
         rst = super().handle()
@@ -87,7 +95,6 @@ class print_handler(display_handler):
     def __init__(self, net, t, rst):
         super().__init__(net, t, rst)
 
-    # TODO modify to support GUI
     def handle(self):
         rst = super().handle()
         for single_rst in rst:

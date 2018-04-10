@@ -1,9 +1,6 @@
 from command.ac_cmd import *
 from command.dc_cmd import *
 from command.tran_cmd import *
-from device.cccs import *
-from device.ccvs import *
-from device.ind import *
 from error import *
 from syntax.get_object import *
 from syntax.spice_parser import *
@@ -22,7 +19,7 @@ class network():
         print("Begin to parse the netlist...")
         try:
             self.tree = self.parser.parse(self.code)
-            #print(self.tree)
+            print(self.tree)
         except Exception as err:
             raise parser_syntax_error("Bad syntax!\n" + str(err))
         print("Finish the parsing of netlist.")
