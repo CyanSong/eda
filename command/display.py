@@ -98,5 +98,5 @@ class print_handler(display_handler):
     def handle(self):
         rst = super().handle()
         for single_rst in rst:
-            print(single_rst[0])
-            print(single_rst[1])
+            print(single_rst[0],single_rst[1])
+

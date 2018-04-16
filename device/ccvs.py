@@ -16,7 +16,7 @@ class ccvs(linear_device):
     def get_current(self, rst_vec, freq=0):
         return rst_vec[self.index]
 
-    def make_stamp(self, mat, vec, freq=0):
+    def make_stamp(self, type, mat, vec, **kwargs):
         index = self.v_src.index
         assert (self.index is not None and index is not None)
         mat[self.index][index] -= self.val

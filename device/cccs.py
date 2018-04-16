@@ -6,7 +6,7 @@ class cccs(linear_device):
         double_port_device.__init__(self, name, pos_node, neg_node, val)
         self.v_src = v_src
 
-    def make_stamp(self, mat, vec, freq=0):
+    def make_stamp(self, type, mat, vec, **kwargs):
         index = self.v_src.index
         mat[self.pos_node.num][index] += self.val
         mat[self.neg_node.num][index] -= self.val

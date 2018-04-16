@@ -17,7 +17,7 @@ spice_parser = Lark(r"""
     end:".end" [WS]
     
     comment: "*" NONSENSE (["\r"]"\n") 
-    element: (res | cap | vsrc | isrc | induc | vccs | vcvs | ccvs| cccs |diode) ["\r"]"\n"
+    element: (res | cap | vsrc | isrc | induc | vccs | vcvs | ccvs| cccs |diode | mos) ["\r"]"\n"
     command: "." (plot | acdef | dcdef | trandef| print )+ (["\r"]"\n")
     
     res: "r" ELEMENTNAME  pospoint  negpoint value  
@@ -29,6 +29,7 @@ spice_parser = Lark(r"""
     vcvs: "e" ELEMENTNAME pospoint negpoint ctlpospnt ctlnegpnt value
     cccs: "f" ELEMENTNAME pospoint negpoint vname value
     ccvs:"h" ELEMENTNAME pospoint negpoint vname value
+    mos: "m" ELEMENTNAME dpoint gpoint spoint bpoint mosmodel ["l="l] ["w="w]
     diode:"d" ELEMENTNAME pospoint negpoint modelname [area] ["off"] ["ic="vd] 
     dcdef: "dc" dsrc1 [dsrc2]
     acdef: "ac"  [type] pernumber fstart fstop
@@ -36,16 +37,81 @@ spice_parser = Lark(r"""
     plot: "plot" mode (variable)+
     print: "print" mode (variable)+
     
-    ?area: value
-    ?vd: value
-    ?modelname:ELEMENTNAME
+
+    modelname:"model1"  
+            | "model2" 
+    mosmodel:"nm" ->nmos
+            |"pm" ->pmos
     spec:   ["dc"] dvalue           ->vdc 
         | "ac" [amag [aphase]] ->vac
+        | "sin" "("  v0   va  freq td  theta  ")" ->sin
+        | "pulse" "(" v1 v2  td tr tf pw per ")" ->pulse
+    dsrc:src start stop incr
+    type:  "dec"  -> dec
+            | "lin" -> lin
+            |"oct"  -> oct
+    pernumber: INT
+    ?mode: "ac" -> ac
+     | "dc" -> dc
+     | "tran" ->tran
+    variable: vi [part] "(" pointval ")"
+    pointval: POINT            -> valofpoint
+            | POINT "," POINT -> diffofpoint
+            | elemtype ELEMENTNAME  -> byname
+    
+    ?elemtype:   "r" ->r
+               | "c" ->c
+               | "v" ->v
+               | "i" ->i
+               | "l" ->l
+               | "g" ->g
+               | "e" ->e
+               | "f" ->f
+               | "h" ->h
+               | "d" ->d
+    
+    
+    POINT: INT
+    src: vi ELEMENTNAME
+    value: NUMBER [UNIT]
+    ?part: "m" -> mag
+    |"r" -> real
+    |"p"  -> phase 
+    |"i" -> img
+    |"db" -> db
+    ?vi:"v"     -> v
+        | "i" -> i
+    vname: "v" ELEMENTNAME
+    
+    NONSENSE:/[^\n]+/
+    ELEMENTNAME: /([0-9]|[a-z])+/
+
+    
+    UNIT: "k" | "p" | "n" | "u" | "m" | "f"|"meg"|"g"|"t"|"db" 
+    ?l:value
+    ?w:value
+    ?freq:value
+    ?area: value
+    ?vd: value
+    ?v0:value
+    ?va:value
+    ?td:value
+    ?v1:value
+    ?v2:value
+    ?tf:value
+    ?tr:value
+    ?pw:value
+    ?per:value
+    ?theta:value  
     ?dvalue:value
     ?amag:value
     ?aphase:value
     ?pospoint: POINT
     ?negpoint: POINT
+    ?dpoint:POINT
+    ?gpoint:POINT
+    ?spoint:POINT
+    ?bpoint:POINT
     ?ctlpospnt:POINT 
     ?ctlnegpnt:POINT
     ?fstart: value
@@ -56,32 +122,7 @@ spice_parser = Lark(r"""
     ?max_int : value
     ?dsrc1:dsrc
     ?dsrc2:dsrc
-    dsrc:src start stop incr
-    type:  "dec"  -> dec
-            | "lin" -> lin
-            |"oct"  -> oct
-    pernumber: INT
-    ?mode: "ac" -> ac
-         | "dc" -> dc
-         | "tran" ->tran
-    variable: vi [part] "(" pointval ")"
-    ?part: "m" -> mag
-        |"r" -> real
-        |"p"  -> phase 
-        |"i" -> img
-        |"db" -> db
-    ?vi:"v"     -> v
-        | "i" -> i
-    pointval: POINT            -> valofpoint
-            | POINT "," POINT -> diffofpoint
-            | vi ELEMENTNAME  -> byname
-    POINT: INT
-    src: vi ELEMENTNAME
-    vname: "v" ELEMENTNAME
-    value: NUMBER [UNIT]
-    NONSENSE:/[^\n]+/
-    ELEMENTNAME: /([0-9]|[a-z])+/
-    UNIT: "k" | "p" | "n" | "u" | "m" | "f"|"meg"|"g"|"t"|"db" 
+
     %import common.SIGNED_NUMBER    -> NUMBER
     %import common.INT 
     %import common.WS_INLINE -> W

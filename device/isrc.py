@@ -5,9 +5,9 @@ class isrc(linear_device):
     def __init__(self, name, pos_node, neg_node, val):
         double_port_device.__init__(self, name, pos_node, neg_node, val)
 
-    def make_stamp(self, mat, vec, freq=0, val=None):
+    def make_stamp(self, type, mat, vec, **kwargs):
+        val = kwargs['val'] if 'val' in kwargs.keys() else self.val
         assert (self.pos_node.num < len(vec) and self.pos_node.num < len(vec))
-        val = self.val if val is None else val
         vec[self.pos_node.num][0] -= val
         vec[self.neg_node.num][0] += val
 

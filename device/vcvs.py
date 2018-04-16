@@ -1,5 +1,6 @@
 from device.device import *
 
+
 class vcvs(linear_device):
     def __init__(self, name, pos_node, neg_node, ctl_pos_node, ctl_neg_node, val):
         double_port_device.__init__(self, name, pos_node, neg_node, val)
@@ -16,7 +17,7 @@ class vcvs(linear_device):
     def get_current(self, rst_vec, freq=0):
         return rst_vec[self.index]
 
-    def make_stamp(self, mat, vec, freq=0):
+    def make_stamp(self, mat, vec, **kwargs):
         assert (self.index is not None)
         mat[self.index][self.pos_node.num] += 1
         mat[self.index][self.neg_node.num] -= 1

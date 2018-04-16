@@ -1,21 +1,27 @@
 import math
 
+import error
 from device.device import *
 
 
 class diode(double_port_device):
-    def __init__(self, name, pos_node, neg_node, val=1, alpha=40, ic=0):
+    def __init__(self, name, pos_node, neg_node, val=7**-9, alpha=40, ic=0):
         super().__init__(name, pos_node, neg_node, val)
         self.ic = ic
         self.alpha = alpha
 
-    def make_stamp(self, mat, vec, freq=0,last_rst=None):
-        if last_rst is None:
+    def make_stamp(self, type, mat, vec, **kwargs):
+        try:
+            last_itr = kwargs['last_itr']
+        except KeyError:
+            raise error.internal_error("Loss of argument!")
+
+        if last_itr is None:
             v_d = self.ic
             i_d = self.val * (math.exp(self.alpha * v_d) - 1)
         else:
-            v_d = self.pos_node.get_voltage(last_rst) - self.neg_node.get_voltage(last_rst)
-            i_d = self.get_current(last_rst)
+            v_d = self.pos_node.get_voltage(last_itr) - self.neg_node.get_voltage(last_itr)
+            i_d = self.get_current(last_itr)
         g_0 = self.alpha * math.exp(self.alpha * v_d) * self.val
         i_0 = i_d - g_0 * v_d
         vec[self.pos_node.num][0] -= i_0

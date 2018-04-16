@@ -7,6 +7,7 @@ from device.ccvs import *
 from device.diode import *
 from device.ind import *
 from device.isrc import *
+from device.mos import *
 from device.res import *
 from device.vccs import *
 from device.vcvs import *
@@ -75,22 +76,24 @@ def get_vsrc(element_tree, node_dict):
     nodes = remap_node([i.value for i in element_tree.children[1:3]], node_dict)
     name = "v" + element_tree.children[0].value
     spec = element_tree.children[3]
-
     if spec.data == 'vdc':
         src_type = 'dc'
         dc_val = parse_value(spec.children[-1], float)
         return vsrc(name, nodes[0], nodes[1], src_type=src_type, dc_val=dc_val)
-    else:
+    elif spec.data == 'vac':
         src_type = 'ac'
         ac_mag = parse_value(spec.children[0]) if len(spec.children) > 0 else 0
         ac_phase = parse_value(spec.children[1]) if len(spec.children) > 1 else 0
         return vsrc(name, nodes[0], nodes[1], src_type, ac_mag=ac_mag, ac_phase=ac_phase)
+    else:
+        src_type = 'fun'
+        return vsrc(name, nodes[0], nodes[1], src_type, fun=get_fun(spec))
 
 
 def get_diode(element_tree, node_dict):
     nodes = remap_node([i.value for i in element_tree.children[1:3]], node_dict)
     name = "d" + element_tree.children[0].value
-    model_name = element_tree.children[3].value
+    model_name = element_tree.children[3].data
     if True:  # modify according to model name
         if len(element_tree.children) == 5:
             ic = parse_value(element_tree.children[4], float)
@@ -99,8 +102,20 @@ def get_diode(element_tree, node_dict):
             return diode(name, nodes[0], nodes[1])
 
 
+def get_mos(element_tree, node_dict):
+    nodes = remap_node([i.value for i in element_tree.children[1:5]], node_dict)
+    name = "m" + element_tree.children[0].value
+    model_name = element_tree.children[5].data
+    if len(element_tree.children) == 8:
+        w = parse_value(element_tree.children[4], float)
+        l = parse_value(element_tree.children[4], float)
+        return mos(name, nodes[0], nodes[1], nodes[2], nodes[3], model_name, w, l)
+    else:
+        return mos(name, nodes[0], nodes[1], nodes[2], nodes[3], model_name)
+
+
 get_device = {'vsrc': get_vsrc, 'cap': get_cap, 'ind': get_ind, 'isrc': get_isrc, 'vccs': get_vccs, 'vcvs': get_vcvs,
-              'ccvs': get_ccvs, 'cccs': get_cccs, 'res': get_res, 'diode': get_diode}
+              'ccvs': get_ccvs, 'cccs': get_cccs, 'res': get_res, 'diode': get_diode, 'mos': get_mos}
 
 
 def get_variable(variable_tree):
@@ -119,6 +134,13 @@ def get_variable(variable_tree):
         return variable(variable_tree.children[0].data, part, val_diff, element_name)
     else:
         return variable(variable_tree.children[0].data, 'whole', val_diff, element_name)
+
+
+def get_fun(fun_tree):
+    if fun_tree.data == 'pulse':
+        return pulse(*[parse_value(i, float) for i in fun_tree.children])
+    elif fun_tree.data == 'sin':
+        return sin(*[parse_value(i, float) for i in fun_tree.children])
 
 
 def get_display_task(cmd_tree, display_mode):
