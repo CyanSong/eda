@@ -49,4 +49,8 @@ class cap(linear_device):
         self.tran_index = None
 
     def get_current(self, rst_vec, freq=0):
-        return (self.pos_node.get_voltage(rst_vec) - self.neg_node.get_voltage(rst_vec)) * self.val * complex(0, freq)
+        v_diff = self.pos_node.get_voltage(rst_vec) - self.neg_node.get_voltage(rst_vec)
+        return v_diff * self.val * complex(0, freq) if freq != 0 else 0
+
+    def get_tran_current(self, rst_vec):
+        return rst_vec[self.tran_index]
