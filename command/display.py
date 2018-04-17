@@ -1,6 +1,7 @@
 import cmath
 
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib import interactive
 
 from command.handler import *
@@ -15,13 +16,13 @@ class variable():
         if self.part == 'whole':
             return rst
         elif self.part == 'real':
-            return [i.real for i in rst]
+            return rst.real
         elif self.part == 'img':
-            return [i.imag for i in rst]
+            return rst.imag
         elif self.part == 'mag':
-            return [abs(i) for i in rst]
+            return np.abs(rst)
         elif self.part == 'phase':
-            return [cmath.phase(i)for i in rst]
+            return np.vectorize(cmath.phase)(rst)
         else:
             pass
 
@@ -36,12 +37,11 @@ class display_handler(handler):
                 "{} simulation has not been defined, therefore can not be displayed!".format(task.mode))
 
     def handle(self):
-        return [self.get_rst(i) for i in self.task.variable_list]
+        return np.array([self.get_rst(i) for i in self.task.variable_list])
 
     def get_rst(self, var):
         print("Fetching the result...")
-        rst = self.task_handler.handle()
-        seq = self.task_handler.task.generate_seq()
+        seq, rst = self.task_handler.handle()
         if var.vi_type == 'v':
             val_diff = var.val_diff
             if var.element_name is not None:
@@ -54,22 +54,25 @@ class display_handler(handler):
                 val_diff = (self.net.node_dict[val_diff[0]].num, self.net.node_dict[val_diff[1]].num)
             except KeyError:
                 raise net_definition_error("this node {} or node {} is not defined".format(val_diff[0], val_diff[1]))
-
-            val_diff_rst = [val[val_diff[0]] - val[val_diff[1]] for val in rst]
+            val_diff_rst = np.array([val[val_diff[0]] - val[val_diff[1]] for val in rst])
+            if self.task.mode == 'tran':
+                seq_select = self.task_handler.task.cut_seq(seq)
+                seq, val_diff_rst = seq[seq_select], val_diff_rst[seq_select]
             return seq, var.format_rst(val_diff_rst)
         else:
             try:
-                device = self.net.elements[var.element_name]
+                ele = self.net.elements[var.element_name]
             except KeyError:
                 raise net_definition_error("this element {} is not defined".format(var.element_name))
             if self.task.mode == 'ac':
-                tran_rst = [device.get_current(single_rst, seq[i]) for i, single_rst in
-                            enumerate(rst)]
+                tran_rst = np.array([ele.get_current(single_rst, seq[i]) for i, single_rst in
+                                     enumerate(rst)])
             elif self.task.mode == 'dc':
-                tran_rst = [device.get_current(single_rst) for single_rst in rst]
+                tran_rst = np.array([ele.get_current(i) for i in rst])
             else:
-                tran_rst = [device.get_current(single_rst) for single_rst in rst]
-                seq, tran_rst = self.task_handler.task.cut_seq(seq), self.task_handler.task.cut_seq(tran_rst)
+                tran_rst = np.array([ele.get_current(i) for i in rst])
+                seq_select = self.task_handler.task.cut_seq(seq)
+                seq, val_diff_rst = seq[seq_select], tran_rst[seq_select]
             return seq, var.format_rst(tran_rst)
 
 
@@ -83,9 +86,9 @@ class plot_handler(display_handler):
         if len(rst) > 1:
             plt.subplot()
             for i, single_rst in enumerate(rst):
-                plt.plot(single_rst[0], single_rst[1])
+                plt.scatter(single_rst[0], single_rst[1], marker='.')
         else:
-            plt.plot(rst[0][0], rst[0][1])
+            plt.scatter(rst[0][0], rst[0][1], marker='.')
         interactive(False)
         plt.show()
         print("Finish the plot.")
@@ -98,5 +101,4 @@ class print_handler(display_handler):
     def handle(self):
         rst = super().handle()
         for single_rst in rst:
-            print(single_rst[0],single_rst[1])
-
+            print(single_rst[0], single_rst[1])

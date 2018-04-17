@@ -1,6 +1,8 @@
 import functools
 from multiprocessing import Pool
 
+import numpy as np
+
 from command.basic_solver import basic_solver
 from command.handler import handler
 
@@ -16,11 +18,11 @@ class ac_handler(handler):
 
         if len(seq) * len(elements) ** 2 > 125000:
             with Pool(4) as pool:
-                rst = pool.map(solver, seq)
+                rst = np.array(pool.map(solver, seq))
         else:
-            rst = [solver(i) for i in seq]
+            rst = np.array([solver(i) for i in seq])
         print("Finish the dc simulation.")
-        return rst
+        return seq, rst
 
 
 def ac_solver(ground_node, basic_len, elements_dict, linear, freq):

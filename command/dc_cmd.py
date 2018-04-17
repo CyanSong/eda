@@ -24,12 +24,11 @@ class dc_handler(handler):
                                    self.max_iter, vname)
         if len(seq) * len(elements) ** 2 > 125000:
             with Pool(4) as pool:
-                rst = pool.map(solver, seq)
+                rst = np.array(pool.map(solver, seq))
         else:
-
-            rst = [solver(i) for i in seq]
+            rst = np.array([solver(i) for i in seq])
         print("Finish the dc simulation.")
-        return rst
+        return seq, rst
 
 
 def dc_solver(ground_node, basic_len, elements_dict, linear, error_bound, max_iter, vname=None, val=None):
@@ -43,6 +42,6 @@ def dc_solver(ground_node, basic_len, elements_dict, linear, error_bound, max_it
             new_rst = basic_solver(ground_node, basic_len, elements_dict, 'dc', linear, last_itr=old_rst,
                                    vname=vname, val=val)
             iter_num += 1
-        if iter_num ==  max_iter:
+        if iter_num == max_iter:
             print("Warning: iteration reach maximum number and the circuit may not converge!")
     return new_rst
