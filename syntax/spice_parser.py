@@ -32,7 +32,7 @@ spice_parser = Lark(r"""
     mos: "m" ELEMENTNAME dpoint gpoint spoint bpoint mosmodel ["l="l] ["w="w]
     diode:"d" ELEMENTNAME pospoint negpoint modelname [area] ["off"] ["ic="vd] 
     dcdef: "dc" dsrc1 [dsrc2]
-    acdef: "ac"  [type] pernumber fstart fstop
+    acdef: "ac"  type pernumber fstart fstop
     trandef: "tran" incr stop [start [max_int]]
     plot: "plot" mode (variable)+
     print: "print" mode (variable)+

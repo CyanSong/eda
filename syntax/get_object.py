@@ -150,12 +150,8 @@ def get_display_task(cmd_tree, display_mode):
 
 
 def get_ac_task(cmd):
-    if len(cmd.children) == 3:
-        return ac_task(parse_value(cmd.children[0], int), parse_value(cmd.children[1], float),
-                       parse_value(cmd.children[2], float))
-    else:
-        return ac_task(parse_value(cmd.children[1], int), parse_value(cmd.children[2], float),
-                       parse_value(cmd.children[3], float), cmd.children[0])
+    return ac_task(parse_value(cmd.children[1], int), parse_value(cmd.children[2], float),
+                       parse_value(cmd.children[3], float), cmd.children[0].data)
 
 
 def get_dc_task(cmd_tree):

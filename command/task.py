@@ -16,17 +16,26 @@ class dc_task(task):
 
 
 class ac_task(task):
-    def __init__(self
-                 , number, start, stop, mode='dec'):
+    def __init__(self, number, start, stop, mode):
         self.mode = mode
         self.number = number
         self.start = start
         self.stop = stop
 
-    # TODO:need to modify to sopport more mode
     def generate_seq(self):
-        step = (self.stop - self.start) / self.number
-        return np.arange(self.start, self.stop, step)
+        if self.mode == 'lin':
+            step = (self.stop - self.start) / self.number
+            return np.arange(self.start, self.stop, step)
+        elif self.mode == 'dec':
+            start = np.log10(self.start)
+            stop = np.log10(self.stop)
+            num = self.number * (stop - start)
+            return np.logspace(start, stop, num, base=10)
+        else:
+            start = np.log2(self.start)
+            stop = np.log2(self.stop)
+            num = self.number * (stop - start)
+            return np.logspace(start, stop, num, base=2)
 
 
 class tran_task(task):

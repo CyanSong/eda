@@ -21,9 +21,11 @@ class ac_handler(handler):
                 rst = np.array(pool.map(solver, seq))
         else:
             rst = np.array([solver(i) for i in seq])
-        print("Finish the dc simulation.")
+        print("Finish the ac simulation.")
         return seq, rst
 
+    def get_axis_mode(self):
+        return self.task.mode
 
 def ac_solver(ground_node, basic_len, elements_dict, linear, freq):
     return basic_solver(ground_node, basic_len, elements_dict, 'ac', linear, freq=freq)

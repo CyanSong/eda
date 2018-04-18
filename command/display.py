@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import interactive
 
+from command.ac_cmd import ac_handler
+from command.dc_cmd import dc_handler
 from command.handler import *
 from error import net_definition_error
 
@@ -23,8 +25,15 @@ class variable():
             return np.abs(rst)
         elif self.part == 'phase':
             return np.vectorize(cmath.phase)(rst)
+        elif self.part == 'db':
+            return 20 * np.log10(rst)
+
+    def toString(self):
+        if self.element_name is not None:
+            return "{}({})/{}".format(self.vi_type, self.element_name, "V" if self.vi_type == 'v' else "A").capitalize()
         else:
-            pass
+            return "{}({},{})/{}".format(self.vi_type, self.val_diff[0], self.val_diff[1],
+                                         "V" if self.vi_type == 'v' else "A")
 
 
 class display_handler(handler):
@@ -37,7 +46,7 @@ class display_handler(handler):
                 "{} simulation has not been defined, therefore can not be displayed!".format(task.mode))
 
     def handle(self):
-        return np.array([self.get_rst(i) for i in self.task.variable_list])
+        return [self.get_rst(i) for i in self.task.variable_list]
 
     def get_rst(self, var):
         print("Fetching the result...")
@@ -58,7 +67,7 @@ class display_handler(handler):
             if self.task.mode == 'tran':
                 seq_select = self.task_handler.task.cut_seq(seq)
                 seq, val_diff_rst = seq[seq_select], val_diff_rst[seq_select]
-            return seq, var.format_rst(val_diff_rst)
+            return var.toString(), seq, var.format_rst(val_diff_rst)
         else:
             try:
                 ele = self.net.elements[var.element_name]
@@ -73,7 +82,7 @@ class display_handler(handler):
                 tran_rst = np.array([ele.get_current(i) for i in rst])
                 seq_select = self.task_handler.task.cut_seq(seq)
                 seq, val_diff_rst = seq[seq_select], tran_rst[seq_select]
-            return seq, var.format_rst(tran_rst)
+            return var.toString(), seq, var.format_rst(tran_rst)
 
 
 class plot_handler(display_handler):
@@ -83,15 +92,43 @@ class plot_handler(display_handler):
     def handle(self):
         print("Begin to plot...")
         rst = super().handle()
+        mode = self.get_x_mode()
         if len(rst) > 1:
-            plt.subplot()
+            plt.figure(figsize=(4 * len(rst), 4))
             for i, single_rst in enumerate(rst):
-                plt.scatter(single_rst[0], single_rst[1], marker='.')
+                plt.subplot(1, len(rst), i + 1)
+                xlabel, ylable = self.get_labels(single_rst)
+                if mode != 'lin':
+                    plt.semilogx(single_rst[1], single_rst[2], marker='.')
+                else:
+                    plt.scatter(single_rst[1], single_rst[2], marker='.')
+                plt.xlabel(xlabel)
+                plt.ylabel(ylable)
         else:
-            plt.scatter(rst[0][0], rst[0][1], marker='.')
+            xlabel, ylable = self.get_labels(rst[0])
+            if mode != 'lin':
+                plt.semilogx(rst[0][1], rst[0][2], marker='.')
+            else:
+                plt.scatter(rst[0][1], rst[0][2], marker='.')
+            plt.xlabel(xlabel)
+            plt.ylabel(ylable)
         interactive(False)
         plt.show()
         print("Finish the plot.")
+
+    def get_x_mode(self):
+        if isinstance(self.task_handler, ac_handler):
+            return self.task_handler.get_axis_mode()
+        else:
+            return 'lin'
+
+    def get_labels(self, single_rst):
+        if isinstance(self.task_handler, ac_handler):
+            return "freq(Hz)", single_rst[0]
+        elif isinstance(self.task_handler, dc_handler):
+            return self.task_handler.task.src1, single_rst[0]
+        else:
+            return "t/s", single_rst[0]
 
 
 class print_handler(display_handler):
@@ -101,4 +138,4 @@ class print_handler(display_handler):
     def handle(self):
         rst = super().handle()
         for single_rst in rst:
-            print(single_rst[0], single_rst[1])
+            print(single_rst[1], single_rst[2])

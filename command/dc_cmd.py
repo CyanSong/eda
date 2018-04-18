@@ -31,6 +31,7 @@ class dc_handler(handler):
         return seq, rst
 
 
+
 def dc_solver(ground_node, basic_len, elements_dict, linear, error_bound, max_iter, vname=None, val=None):
     new_rst = basic_solver(ground_node, basic_len, elements_dict, 'dc', linear, vname=vname, val=val, last_itr=None)
     if not linear:
