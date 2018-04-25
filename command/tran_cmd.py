@@ -1,5 +1,3 @@
-import math
-
 from basic import *
 from command.basic_solver import basic_solver
 from command.handler import handler
@@ -14,7 +12,7 @@ class tran_handler(handler):
     def __init__(self, net, t):
         handler.__init__(self, net, t)
         self.error_bound = 10 ** -6
-        self.max_iter = 10000
+        self.max_iter = 1000
         self.method = 'trap'
 
     def handle(self):
@@ -50,7 +48,7 @@ def auto_get_h(method, elements, t_list, rst, default_h, error_bound):
                 v_diff_2 = ele.get_tran_current(rst[-1]) - ele.get_tran_current(rst[-2])
                 i_diff_1 = v_diff_1 / (t_list[-2] - t_list[-3] + minus)
                 i_diff_2 = v_diff_2 / (t_list[-1] - t_list[-2] + minus)
-                h_permitted = math.sqrt(12 * ele.val / (i_diff_1 - i_diff_2 + minus) * error_bound)
+                h_permitted = math.sqrt(abs(12 * ele.val / (i_diff_1 - i_diff_2 + minus) * error_bound))
                 h = min(h, h_permitted)
             else:
                 pass
@@ -59,7 +57,7 @@ def auto_get_h(method, elements, t_list, rst, default_h, error_bound):
                 [v1, v2, v3] = [ele.pos_node.get_voltage(i) - ele.neg_node.get_voltage(i) for i in rst[-3:]]
                 v_diff_1 = (v2 - v1) / (t_list[-2] - t_list[-3] + minus)
                 v_diff_2 = (v3 - v2) / (t_list[-1] - t_list[-2] + minus)
-                h_permitted = math.sqrt(12 * ele.val / (v_diff_1 - v_diff_2 + minus) * error_bound)
+                h_permitted = math.sqrt(abs(12 * ele.val / (v_diff_1 - v_diff_2 + minus) * error_bound))
                 h = min(h, h_permitted)
             else:
                 pass

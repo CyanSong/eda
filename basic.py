@@ -5,7 +5,7 @@ import numpy as np
 
 def parse_value(value_tree, t=float):
     simple_unit_dict = {"k": 1000, "p": 10 ** -12, "n": 10 ** -9, "u": 10 ** -6, "m": 10 ** -3, "f": 10 ** -15,
-                        "meg": 10 ** 3, 'G': 10 ** 6, 'T': 10 ** 9}
+                        "meg": 10 ** 3, 'g': 10 ** 6, 't': 10 ** 9}
 
     if len(value_tree.children) > 1 and t == float:
         if value_tree.children[1].value in simple_unit_dict.keys():

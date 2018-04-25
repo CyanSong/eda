@@ -101,7 +101,7 @@ class plot_handler(display_handler):
                 if mode != 'lin':
                     plt.semilogx(single_rst[1], single_rst[2], marker='.')
                 else:
-                    plt.scatter(single_rst[1], single_rst[2], marker='.')
+                    plt.plot(single_rst[1], single_rst[2], marker='.')
                 plt.xlabel(xlabel)
                 plt.ylabel(ylable)
         else:
@@ -109,7 +109,7 @@ class plot_handler(display_handler):
             if mode != 'lin':
                 plt.semilogx(rst[0][1], rst[0][2], marker='.')
             else:
-                plt.scatter(rst[0][1], rst[0][2], marker='.')
+                plt.plot(rst[0][1], rst[0][2], marker='.')
             plt.xlabel(xlabel)
             plt.ylabel(ylable)
         interactive(False)

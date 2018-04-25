@@ -107,14 +107,14 @@ def get_mos(element_tree, node_dict):
     name = "m" + element_tree.children[0].value
     model_name = element_tree.children[5].data
     if len(element_tree.children) == 8:
-        w = parse_value(element_tree.children[4], float)
-        l = parse_value(element_tree.children[4], float)
+        w = parse_value(element_tree.children[6], float)
+        l = parse_value(element_tree.children[7], float)
         return mos(name, nodes[0], nodes[1], nodes[2], nodes[3], model_name, w, l)
     else:
         return mos(name, nodes[0], nodes[1], nodes[2], nodes[3], model_name)
 
 
-get_device = {'vsrc': get_vsrc, 'cap': get_cap, 'ind': get_ind, 'isrc': get_isrc, 'vccs': get_vccs, 'vcvs': get_vcvs,
+get_device = {'vsrc': get_vsrc, 'cap': get_cap, 'induc': get_ind, 'isrc': get_isrc, 'vccs': get_vccs, 'vcvs': get_vcvs,
               'ccvs': get_ccvs, 'cccs': get_cccs, 'res': get_res, 'diode': get_diode, 'mos': get_mos}
 
 

@@ -1,5 +1,3 @@
-from command.ac_cmd import *
-from command.dc_cmd import *
 from command.tran_cmd import *
 from error import *
 from syntax.get_object import *
@@ -52,7 +50,10 @@ class network():
 
     def add_element(self, element, node_dict):
         element_type = element.data
-        ele = get_device[element_type](element, node_dict)
+        try:
+            ele = get_device[element_type](element, node_dict)
+        except KeyError:
+            raise internal_error("{} is not defined".format(element_type))
         print("----Add element {}".format(ele.name))
         return ele
 

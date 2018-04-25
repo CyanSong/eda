@@ -12,6 +12,7 @@ class dc_handler(handler):
     def __init__(self, net, t):
         self.error_bound = 10 ** -6
         self.max_iter = 1000
+        self.scale_limit=125000
         handler.__init__(self, net, t)
 
     def handle(self):
@@ -22,11 +23,26 @@ class dc_handler(handler):
             raise net_definition_error("The element: {} is not defined".format(vname))
         solver = functools.partial(dc_solver, ground_node, basic_len, elements, self.net.linear, self.error_bound,
                                    self.max_iter, vname)
-        if len(seq) * len(elements) ** 2 > 125000:
+
+        if len(seq) * len(elements) ** 2 > self.scale_limit:
+            print("using multiple process!")
             with Pool(4) as pool:
                 rst = np.array(pool.map(solver, seq))
         else:
             rst = np.array([solver(i) for i in seq])
+        # start = time.time()
+        # print("using multiple process!")
+        # with Pool(4) as pool:
+        #     rst = np.array(pool.map(solver, seq))
+        # end = time.time()
+        # print("cost {} time".format(end-start))
+        #
+        # start = time.time()
+        # print("using single process!")
+        # rst = np.array([solver(i) for i in seq])
+        # end = time.time()
+        # print("cost {} time".format(end-start))
+
         print("Finish the dc simulation.")
         return seq, rst
 

@@ -2,7 +2,7 @@ import sys
 
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import (QWidget, QPushButton, QTextEdit, QFileDialog,
-                             QHBoxLayout, QVBoxLayout, QApplication, QMessageBox)
+                             QHBoxLayout, QVBoxLayout, QApplication, QMessageBox, QLabel)
 
 import network as nt
 from error import external_error
@@ -25,7 +25,11 @@ class Example(QWidget):
         save_btn = QPushButton("Save file")
         save_btn.clicked.connect(self.save_file)
 
-        schematic_btn = QPushButton("See schematic")
+        exit_btn = QPushButton("Exit")
+        exit_btn.clicked.connect(app.quit)
+
+        message_label = QLabel("Message:")
+        netlist_label = QLabel("Netlist:")
         self.netlist_edit = QTextEdit()
         self.rst_form = QTextEdit()
         self.rst_form.setReadOnly(True)
@@ -38,7 +42,7 @@ class Example(QWidget):
 
         btn_box.addWidget(simu_btn)
         btn_box.addWidget(save_btn)
-        btn_box.addWidget(schematic_btn)
+        btn_box.addWidget(exit_btn)
 
         input_box = QHBoxLayout()
 
@@ -46,8 +50,10 @@ class Example(QWidget):
         input_box.addLayout(btn_box)
 
         whole = QVBoxLayout()
-        whole.addLayout(input_box, 2)
-        whole.addWidget(self.rst_form, 1)
+        whole.addWidget(netlist_label)
+        whole.addLayout(input_box, 5)
+        whole.addWidget(message_label)
+        whole.addWidget(self.rst_form, 2)
 
         self.setLayout(whole)
 
