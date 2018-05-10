@@ -1,8 +1,8 @@
-from basic import *
 from device.cap import *
 from device.ind import *
 from device.vsrc import *
-from error import *
+from src.basic import *
+from src.error import *
 
 
 def basic_solver(ground_node, basic_len, elements_dict, type, linear, **kwargs):

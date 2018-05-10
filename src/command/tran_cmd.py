@@ -1,9 +1,9 @@
-from basic import *
 from command.basic_solver import basic_solver
 from command.handler import handler
 from command.task import *
 from device.cap import *
 from device.ind import *
+from src.basic import *
 
 minus = 10 ** -12
 

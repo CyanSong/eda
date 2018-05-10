@@ -1,7 +1,7 @@
 from cmath import rect
 
-import error
 from device.device import *
+from src import error
 
 
 class vsrc(linear_device):

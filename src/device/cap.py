@@ -1,5 +1,5 @@
-import error
 from device.device import *
+from src import error
 
 
 class cap(linear_device):

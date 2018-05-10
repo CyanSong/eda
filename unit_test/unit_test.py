@@ -1,16 +1,16 @@
 import os
 
-import network as nt
+from src import network as nt
 
 
 def test(fileName):
-    circuits = open("test_netlist/" + fileName + ".sp")
+    circuits = open("unit_test/test_netlist/" + fileName + ".sp")
     circuits = circuits.read()
     nt.network(circuits)
 
 
 def unit_test():
-    for root, dirs, files in os.walk("test_netlist/"):
+    for root, dirs, files in os.walk("unit_test/test_netlist/"):
         for file in files:
             circuits = open(root + file)
             circuits = circuits.read()
@@ -18,7 +18,7 @@ def unit_test():
 
 
 if __name__ == "__main__":
-    #unit_test()
-    test('dc_test')
+    unit_test()
+    # test('dc_test')
     # test('ac_test')
     # test('tran_test')

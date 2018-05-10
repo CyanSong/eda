@@ -1,7 +1,7 @@
 import math
 
-import error
 from device.device import *
+from src import error
 
 
 class diode(double_port_device):

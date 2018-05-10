@@ -1,5 +1,5 @@
 from command.tran_cmd import *
-from error import *
+from src.error import *
 from syntax.get_object import *
 from syntax.spice_parser import *
 

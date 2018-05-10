@@ -4,9 +4,9 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import (QWidget, QPushButton, QTextEdit, QFileDialog,
                              QHBoxLayout, QVBoxLayout, QApplication, QMessageBox, QLabel)
 
-import network as nt
-from error import external_error
-from log import OutLog
+from src import network as nt
+from src.error import external_error
+from src.log import OutLog
 
 
 class Example(QWidget):
@@ -94,8 +94,7 @@ class Example(QWidget):
                 self.rst_form.append("Error:{}".format(str(e)))
                 QMessageBox.information(self, 'Error', str(e))
 
-
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ex = Example()
+    Example()
     sys.exit(app.exec_())

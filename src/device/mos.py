@@ -1,5 +1,5 @@
-import error
 from device.device import *
+from src import error
 
 default_l = 1
 default_w = 1
