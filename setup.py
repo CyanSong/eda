@@ -6,12 +6,10 @@ setup(
       author="Cyan Song",
       url="https://github.com/CyanSong/eda",
       license="LGPL",
-      packages= find_packages(exclude=["*tests.*"]),
+      packages= find_packages(exclude=["gui_main.py",'tree.png','READNE.md','log.py']),
       scripts=["src/network.py"],
       install_requires=[
           "numpy",
-           "matplotlib",
-          "pyqt",
           "lark-parser"
       ]
       )

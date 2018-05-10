@@ -1,6 +1,6 @@
 import os
 
-from src import network as nt
+import network as nt
 
 
 def test(fileName):
@@ -10,7 +10,7 @@ def test(fileName):
 
 
 def unit_test():
-    for root, dirs, files in os.walk("unit_test/test_netlist/"):
+    for root, dirs, files in os.walk("../unit_test/test_netlist/"):
         for file in files:
             circuits = open(root + file)
             circuits = circuits.read()
