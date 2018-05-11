@@ -46,7 +46,7 @@ spice_parser = Lark(r"""
         | "ac" [amag [aphase]] ->vac
         | "sin" "("  v0   va  freq td  theta  ")" ->sin
         | "pulse" "(" v1 v2  td tr tf pw per ")" ->pulse
-    dsrc:src start stop incr
+    dsrc:xspice start stop incr
     type:  "dec"  -> dec
             | "lin" -> lin
             |"oct"  -> oct
@@ -72,7 +72,7 @@ spice_parser = Lark(r"""
     
     
     POINT: INT
-    src: vi ELEMENTNAME
+    xspice: vi ELEMENTNAME
     value: NUMBER [UNIT]
     ?part: "m" -> mag
     |"r" -> real

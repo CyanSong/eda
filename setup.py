@@ -1,13 +1,13 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 setup(
-      name="Xspice",
+      name="xspice",
       version="1.0",
       description="My test module",
       author="Cyan Song",
       url="https://github.com/CyanSong/eda",
       license="LGPL",
-      packages= find_packages(exclude=["gui_main.py",'tree.png','READNE.md','log.py']),
-      scripts=["src/network.py"],
+      packages= ['xspice','xspice.command','xspice.device','xspice.syntax'],
+      package_data={'': ['*.md', '*.sp','unit_test.py']},
       install_requires=[
           "numpy",
           "lark-parser"

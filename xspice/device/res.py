@@ -1,4 +1,4 @@
-from device.vccs import vccs
+from .vccs import vccs
 
 
 class res(vccs):

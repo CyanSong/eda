@@ -1,17 +1,19 @@
-from command.tran_cmd import *
-from src.error import *
-from syntax.get_object import *
-from syntax.spice_parser import *
+from .command.ac_cmd import *
+from .command.dc_cmd import *
+from .command.display import plot_handler, print_handler
+from .command.tran_cmd import *
+from .syntax.get_object import *
+from .syntax.spice_parser import *
 
 
-class network():
+class Xspice():
     def __init__(self, code):
         self.code = pre_compile(code)
         self.parser = spice_parser
         self.linear = True
         self.parse()
         self.elements, self.node_dict = self.build()
-        self.handle_cmds()
+        # self.handle_cmds()
 
     def parse(self):
         print("Begin to parse the netlist...")

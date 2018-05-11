@@ -1,7 +1,7 @@
 from cmath import rect
 
-from device.device import *
-from src import error
+from .device import linear_device, double_port_device
+from ..error import internal_error
 
 
 class vsrc(linear_device):
@@ -16,7 +16,7 @@ class vsrc(linear_device):
             else:
                 self.func = kwargs['fun']
         except KeyError:
-            raise error.internal_error("Loss of argument!")
+            raise internal_error("Loss of argument!")
 
         self.index = None
 
@@ -43,7 +43,7 @@ class vsrc(linear_device):
                 try:
                     t = kwargs['t']
                 except KeyError:
-                    raise error.internal_error("Loss of argument!")
+                    raise internal_error("Loss of argument!")
                 val = self.func.fun(t)
             else:
                 val = self.val

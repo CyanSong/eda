@@ -1,17 +1,17 @@
-from basic import *
-from command.display import *
-from command.task import *
-from device.cap import *
-from device.cccs import *
-from device.ccvs import *
-from device.diode import *
-from device.ind import *
-from device.isrc import *
-from device.mos import *
-from device.res import *
-from device.vccs import *
-from device.vcvs import *
-from device.vsrc import *
+from ..basic import *
+from ..command import display
+from ..command import task
+from ..device import diode
+from ..device import mos
+from ..device.cap import *
+from ..device.cccs import *
+from ..device.ccvs import *
+from ..device.ind import *
+from ..device.isrc import *
+from ..device.res import *
+from ..device.vccs import *
+from ..device.vcvs import *
+from ..device.vsrc import *
 
 
 def get_res(element_tree, node_dict):
@@ -97,9 +97,9 @@ def get_diode(element_tree, node_dict):
     if True:  # modify according to model name
         if len(element_tree.children) == 5:
             ic = parse_value(element_tree.children[4], float)
-            return diode(name, nodes[0], nodes[1], ic=ic)
+            return diode.diode(name, nodes[0], nodes[1], ic=ic)
         else:
-            return diode(name, nodes[0], nodes[1])
+            return diode.diode(name, nodes[0], nodes[1])
 
 
 def get_mos(element_tree, node_dict):
@@ -109,9 +109,9 @@ def get_mos(element_tree, node_dict):
     if len(element_tree.children) == 8:
         w = parse_value(element_tree.children[6], float)
         l = parse_value(element_tree.children[7], float)
-        return mos(name, nodes[0], nodes[1], nodes[2], nodes[3], model_name, w, l)
+        return mos.mos(name, nodes[0], nodes[1], nodes[2], nodes[3], model_name, w, l)
     else:
-        return mos(name, nodes[0], nodes[1], nodes[2], nodes[3], model_name)
+        return mos.mos(name, nodes[0], nodes[1], nodes[2], nodes[3], model_name)
 
 
 get_device = {'vsrc': get_vsrc, 'cap': get_cap, 'induc': get_ind, 'isrc': get_isrc, 'vccs': get_vccs, 'vcvs': get_vcvs,
@@ -131,9 +131,9 @@ def get_variable(variable_tree):
         element_name = point_of_val.children[0].data + point_of_val.children[1].value
     if len(variable_tree.children) == 3:
         part = variable_tree.children[1].data
-        return variable(variable_tree.children[0].data, part, val_diff, element_name)
+        return display.variable(variable_tree.children[0].data, part, val_diff, element_name)
     else:
-        return variable(variable_tree.children[0].data, 'whole', val_diff, element_name)
+        return display.variable(variable_tree.children[0].data, 'whole', val_diff, element_name)
 
 
 def get_fun(fun_tree):
@@ -146,11 +146,11 @@ def get_fun(fun_tree):
 def get_display_task(cmd_tree, display_mode):
     mode = cmd_tree.children[0].data
     var_list = [get_variable(i) for i in cmd_tree.children[1:]]
-    return print_task(mode, var_list) if display_mode == 'print' else plot_task(mode, var_list)
+    return task.print_task(mode, var_list) if display_mode == 'print' else task.plot_task(mode, var_list)
 
 
 def get_ac_task(cmd):
-    return ac_task(parse_value(cmd.children[1], int), parse_value(cmd.children[2], float),
+    return task.ac_task(parse_value(cmd.children[1], int), parse_value(cmd.children[2], float),
                        parse_value(cmd.children[3], float), cmd.children[0].data)
 
 
@@ -159,11 +159,11 @@ def get_dc_task(cmd_tree):
         src = cmd_tree.children[0].children[0]
         vsrc = src.children[0].data + src.children[1].value
         dsrc = [parse_value(i, float) for i in cmd_tree.children[0].children[1:]]
-        return dc_task(vsrc, dsrc[0], dsrc[1], dsrc[2])
+        return task.dc_task(vsrc, dsrc[0], dsrc[1], dsrc[2])
     else:
         pass
 
 
 def get_tran_task(cmd_tree):
     seq = [parse_value(i, float) for i in cmd_tree.children]
-    return tran_task(*seq)
+    return task.tran_task(*seq)

@@ -1,5 +1,5 @@
-from device.device import *
-from src import error
+from .device import linear_device,double_port_device
+from ..error import internal_error
 
 
 class ind(linear_device):
@@ -25,7 +25,7 @@ class ind(linear_device):
             try:
                 freq = kwargs['freq']
             except KeyError:
-                raise error.internal_error("Loss of argument!")
+                raise internal_error("Loss of argument!")
             sl = self.val * (complex(0, freq) if freq != 0 else 0)
             mat[self.index][self.index] -= sl
             mat[self.pos_node.num][self.index] += 1
@@ -38,7 +38,7 @@ class ind(linear_device):
                 h = kwargs['h']
                 method = kwargs['method'] if 'method' in kwargs.keys() else 'trap'
             except KeyError:
-                raise error.internal_error("Loss of argument!")
+                raise internal_error("Loss of argument!")
             if rst_last is None:
                 mat[self.index][self.index] = 1
             else:

@@ -3,8 +3,8 @@ from multiprocessing import Pool
 
 import numpy as np
 
-from command.basic_solver import basic_solver
-from command.handler import handler
+from .basic_solver import basic_solver
+from .handler import handler
 
 
 class ac_handler(handler):

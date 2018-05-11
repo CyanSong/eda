@@ -1,10 +1,11 @@
 import functools
 from multiprocessing import Pool
 
-from command.basic_solver import basic_solver
-from command.handler import handler
-from src.basic import *
-from src.error import *
+import numpy as np
+
+from .basic_solver import basic_solver
+from .handler import handler
+from ..error import *
 
 
 # TODO implement homotopy

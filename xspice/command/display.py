@@ -4,10 +4,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import interactive
 
-from command.ac_cmd import ac_handler
-from command.dc_cmd import dc_handler
-from command.handler import *
-from src.error import net_definition_error
+from .ac_cmd import ac_handler
+from .dc_cmd import dc_handler
+from .handler import handler
 
 
 class variable():

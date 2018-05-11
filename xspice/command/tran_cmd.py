@@ -1,9 +1,11 @@
-from command.basic_solver import basic_solver
-from command.handler import handler
-from command.task import *
-from device.cap import *
-from device.ind import *
-from src.basic import *
+import math
+
+import numpy as np
+
+from .basic_solver import basic_solver
+from .handler import handler
+from ..device import cap
+from ..device import ind
 
 minus = 10 ** -12
 
@@ -42,7 +44,7 @@ def auto_get_h(method, elements, t_list, rst, default_h, error_bound):
         return default_h
     h = default_h
     for ele in elements.values():
-        if isinstance(ele, cap):
+        if isinstance(ele, cap.cap):
             if method == 'trap':
                 v_diff_1 = ele.get_tran_current(rst[-2]) - ele.get_tran_current(rst[-3])
                 v_diff_2 = ele.get_tran_current(rst[-1]) - ele.get_tran_current(rst[-2])
@@ -52,7 +54,7 @@ def auto_get_h(method, elements, t_list, rst, default_h, error_bound):
                 h = min(h, h_permitted)
             else:
                 pass
-        if isinstance(ele, ind):
+        if isinstance(ele, ind.ind):
             if method == 'trap':
                 [v1, v2, v3] = [ele.pos_node.get_voltage(i) - ele.neg_node.get_voltage(i) for i in rst[-3:]]
                 v_diff_1 = (v2 - v1) / (t_list[-2] - t_list[-3] + minus)

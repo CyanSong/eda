@@ -4,9 +4,9 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import (QWidget, QPushButton, QTextEdit, QFileDialog,
                              QHBoxLayout, QVBoxLayout, QApplication, QMessageBox, QLabel)
 
-from src import network as nt
-from src.error import external_error
-from src.log import OutLog
+from xspice import xspice as nt
+from xspice.error import external_error
+from xspice.log import OutLog
 
 
 class Example(QWidget):
@@ -89,7 +89,7 @@ class Example(QWidget):
         circuit = self.netlist_edit.toPlainText()
         if circuit:
             try:
-                rst = nt.network(circuit)
+                rst = nt.Xspice(circuit)
             except external_error as e:
                 self.rst_form.append("Error:{}".format(str(e)))
                 QMessageBox.information(self, 'Error', str(e))

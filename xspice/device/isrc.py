@@ -1,5 +1,4 @@
-from device.device import *
-
+from .device import linear_device,double_port_device
 
 class isrc(linear_device):
     def __init__(self, name, pos_node, neg_node, val):

@@ -1,5 +1,5 @@
-from device.device import *
-from src import error
+from .device import linear_device,double_port_device
+from ..error import internal_error
 
 
 class cap(linear_device):
@@ -12,7 +12,7 @@ class cap(linear_device):
             try:
                 freq = kwargs['freq']
             except KeyError:
-                raise error.internal_error("Loss of argument!")
+                raise internal_error("Loss of argument!")
             sc = self.val * (complex(0, freq) if freq != 0 else 0)
             mat[self.pos_node.num][self.pos_node.num] += sc
             mat[self.pos_node.num][self.neg_node.num] -= sc
@@ -24,7 +24,7 @@ class cap(linear_device):
                 rst_last = kwargs['rst_last']
                 method = kwargs['method'] if 'method' in kwargs.keys() else 'trap'
             except KeyError as e:
-                raise error.internal_error("Loss of argument!")
+                raise internal_error("Loss of argument!")
             if rst_last is None:
                 mat[self.pos_node.num][self.tran_index] += 1
                 mat[self.neg_node.num][self.tran_index] -= 1

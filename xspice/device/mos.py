@@ -1,5 +1,5 @@
-from device.device import *
-from src import error
+from .device import device
+from ..error import internal_error
 
 default_l = 1
 default_w = 1
@@ -26,7 +26,7 @@ class mos(device):
         try:
             last_itr = kwargs['last_itr']
         except KeyError:
-            raise error.internal_error("Loss of argument!")
+            raise internal_error("Loss of argument!")
 
         if last_itr is None:
             pass

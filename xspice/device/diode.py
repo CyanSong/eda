@@ -1,7 +1,7 @@
 import math
 
-from device.device import *
-from src import error
+from .device import double_port_device
+from ..error import internal_error
 
 
 class diode(double_port_device):
@@ -14,7 +14,7 @@ class diode(double_port_device):
         try:
             last_itr = kwargs['last_itr']
         except KeyError:
-            raise error.internal_error("Loss of argument!")
+            raise internal_error("Loss of argument!")
 
         if last_itr is None:
             v_d = self.ic

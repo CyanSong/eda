@@ -1,4 +1,4 @@
-from device.device import *
+from .device import linear_device,double_port_device
 
 
 class cccs(linear_device):

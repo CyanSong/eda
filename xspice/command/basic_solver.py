@@ -1,8 +1,11 @@
-from device.cap import *
-from device.ind import *
-from device.vsrc import *
-from src.basic import *
-from src.error import *
+import numpy as np
+
+from ..basic import generate_linear_equation
+from ..device import cap
+from ..device import device
+from ..device import ind
+from ..device import vsrc
+from ..error import internal_error, circuit_error
 
 
 def basic_solver(ground_node, basic_len, elements_dict, type, linear, **kwargs):
@@ -24,13 +27,13 @@ def basic_solver(ground_node, basic_len, elements_dict, type, linear, **kwargs):
         raise internal_error("Lose argument {}".format(str(e)))
 
     for i in elements_dict.keys():
-        if not isinstance(elements_dict[i], linear_device):
+        if not isinstance(elements_dict[i], device.linear_device):
             elements_dict[i].make_stamp(type, a, b, last_itr=last_itr)
         else:
             if type == 'tran':
-                if isinstance(elements_dict[i], cap) or isinstance(elements_dict[i], ind):
+                if isinstance(elements_dict[i], cap.cap) or isinstance(elements_dict[i], ind.ind):
                     elements_dict[i].make_stamp(type, a, b, h=h, rst_last=last_time, method=method)
-                elif isinstance(elements_dict[i], vsrc):
+                elif isinstance(elements_dict[i], vsrc.vsrc):
                     elements_dict[i].make_stamp(type, a, b, t=t)
                 else:
                     elements_dict[i].make_stamp(type, a, b)
